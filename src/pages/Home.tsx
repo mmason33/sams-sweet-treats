@@ -1,74 +1,94 @@
 import { useMenu } from '../hooks/useMenu'
 import MenuList from '../components/MenuList'
+import Nav from '../components/Nav'
+import { MapPinIcon, ClockIcon } from '../components/icons'
 
-// TODO: replace with Sam's real Toast online-ordering link when available
-const TOAST_ORDER_URL = 'https://www.toasttab.com/'
+const LOGO = `${import.meta.env.BASE_URL}images/sams-logo.png`
 
-const links = [
-  { label: 'Order Ahead', href: TOAST_ORDER_URL },
-  { label: 'Instagram', href: 'https://instagram.com/' },
-  { label: 'Facebook', href: 'https://facebook.com/' },
-]
-
-const photos = [
-  'sams-trailer-1.jpg',
+const galleryPhotos = [
   'sam-cinnamon-rolls.jpg',
   'sam-treat-1.jpg',
-  'sams-trail-2.jpg',
+  'sam-treat-2.jpg',
+  'sam-treat-3.jpg',
+  'sam-treat-4.jpg',
+  'sam-treat-6.jpg',
 ]
 
 export default function Home() {
   const { items, loading } = useMenu()
 
   return (
-    <main className="min-h-full">
-      {/* Hero */}
-      <header className="flex flex-col items-center text-center gap-4 py-12 px-6 bg-cocoa text-cream">
+    <div className="min-h-full">
+      <Nav />
+
+      {/* Brand intro */}
+      <header className="bg-gradient-to-b from-blush to-cream px-6 pb-12 pt-24 text-center">
         <img
-          src={`${import.meta.env.BASE_URL}images/sams-logo.jpg`}
+          src={LOGO}
           alt="Sam's Sweet Treats & Coffee logo"
-          className="w-40 h-40 rounded-full object-cover shadow-lg"
+          className="mx-auto h-40 w-40 object-contain sm:h-48 sm:w-48"
         />
-        <h1 className="text-4xl font-extrabold">Sam's Sweet Treats &amp; Coffee</h1>
-        <p className="max-w-xl text-cream/90">
-          Fresh coffee and handmade treats from our trailer. Find us on the trail!
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-cocoa sm:text-4xl">
+          Sam's Sweet Treats &amp; Coffee
+        </h1>
+        <p className="mx-auto mt-3 max-w-md text-cocoa/70">
+          Fresh coffee and handmade treats, served from our little pink trailer.
         </p>
-        <nav className="flex flex-wrap justify-center gap-3 pt-2">
-          {links.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-2 rounded-full bg-berry text-white font-semibold hover:opacity-90"
-            >
-              {l.label}
-            </a>
-          ))}
-        </nav>
+
+        {/* Info chips */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm font-medium text-cocoa shadow-sm ring-1 ring-cocoa/5">
+            <MapPinIcon className="h-4 w-4 text-berry" />
+            Pine Grove, CA
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm font-medium text-cocoa shadow-sm ring-1 ring-cocoa/5">
+            <ClockIcon className="h-4 w-4 text-berry" />
+            Open 7 days · 5am–3pm
+          </span>
+        </div>
       </header>
 
+      {/* Story */}
+      <section className="mx-auto max-w-2xl px-6 py-12 text-center">
+        <h2 className="text-2xl font-bold text-berry">Our Story</h2>
+        <p className="mt-4 text-lg leading-relaxed text-cocoa/80">
+          Sam has always loved baking. What started as treats for friends and
+          family grew into a small business on wheels — and a whole lot of happy
+          regulars. Every cinnamon roll, muffin, and cup of coffee is made fresh
+          with care, right here in Pine Grove.
+        </p>
+      </section>
+
       {/* Menu */}
-      <section className="max-w-2xl mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-cocoa mb-6">Menu</h2>
+      <section className="mx-auto max-w-2xl px-6 pb-12">
+        <h2 className="mb-6 text-center text-3xl font-bold text-cocoa">Menu</h2>
         {loading ? (
-          <p className="text-cocoa/70 italic">Loading menu…</p>
+          <p className="text-center italic text-cocoa/60">Loading menu…</p>
         ) : (
           <MenuList items={items} />
         )}
       </section>
 
       {/* Gallery */}
-      <section className="max-w-4xl mx-auto px-6 pb-16 grid grid-cols-2 md:grid-cols-4 gap-3">
-        {photos.map((p) => (
-          <img
-            key={p}
-            src={`${import.meta.env.BASE_URL}images/${p}`}
-            alt=""
-            className="aspect-square w-full object-cover rounded-lg"
-          />
-        ))}
+      <section className="mx-auto max-w-4xl px-6 pb-16">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {galleryPhotos.map((p) => (
+            <img
+              key={p}
+              src={`${import.meta.env.BASE_URL}images/${p}`}
+              alt=""
+              loading="lazy"
+              className="aspect-square w-full rounded-2xl object-cover shadow-sm"
+            />
+          ))}
+        </div>
       </section>
-    </main>
+
+      {/* Footer */}
+      <footer className="bg-cocoa px-6 py-10 text-center text-cream">
+        <p className="text-lg font-bold">Sam's Sweet Treats &amp; Coffee</p>
+        <p className="mt-2 text-sm text-cream/80">Pine Grove, CA · Open 7 days a week, 5am–3pm</p>
+      </footer>
+    </div>
   )
 }

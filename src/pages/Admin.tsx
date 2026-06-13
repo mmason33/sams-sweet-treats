@@ -4,7 +4,7 @@ import { useMenu } from '../hooks/useMenu'
 import { addMenuItem, updateMenuItem, deleteMenuItem } from '../lib/menu'
 import { signOutUser } from '../lib/auth'
 import { formatPrice } from '../lib/menuUtils'
-import type { NewMenuItem } from '../lib/menuTypes'
+import type { MenuItem, NewMenuItem } from '../lib/menuTypes'
 
 const empty: NewMenuItem = {
   name: '',
@@ -18,16 +18,38 @@ const empty: NewMenuItem = {
 function AdminInner() {
   const { items } = useMenu()
   const [form, setForm] = useState<NewMenuItem>(empty)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
-  async function handleAdd(e: FormEvent) {
-    e.preventDefault()
-    await addMenuItem(form)
+  function startEdit(item: MenuItem) {
+    setForm({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      available: item.available,
+      sortOrder: item.sortOrder,
+    })
+    setEditingId(item.id)
+  }
+
+  function resetForm() {
     setForm(empty)
+    setEditingId(null)
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (editingId) {
+      await updateMenuItem(editingId, form)
+    } else {
+      await addMenuItem(form)
+    }
+    resetForm()
   }
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+    <main className="mx-auto max-w-3xl p-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-cocoa">Menu Admin</h1>
         <button onClick={() => signOutUser()} className="text-berry underline">
           Sign out
@@ -35,9 +57,9 @@ function AdminInner() {
       </div>
 
       {/* Existing items */}
-      <table className="w-full mb-10 text-left">
+      <table className="mb-10 w-full text-left">
         <thead>
-          <tr className="border-b border-caramel/40 text-cocoa/70 text-sm">
+          <tr className="border-b border-caramel/40 text-sm text-cocoa/70">
             <th className="py-2">Name</th>
             <th>Category</th>
             <th>Price</th>
@@ -52,18 +74,19 @@ function AdminInner() {
               <td>{item.category}</td>
               <td>{formatPrice(item.price)}</td>
               <td>{item.available ? 'Available' : 'Hidden'}</td>
-              <td className="space-x-3 text-sm">
+              <td className="space-x-3 whitespace-nowrap text-sm">
+                <button onClick={() => startEdit(item)} className="text-cocoa hover:underline">
+                  Edit
+                </button>
                 <button
-                  onClick={() =>
-                    updateMenuItem(item.id, { available: !item.available })
-                  }
-                  className="text-caramel"
+                  onClick={() => updateMenuItem(item.id, { available: !item.available })}
+                  className="text-caramel hover:underline"
                 >
                   {item.available ? 'Hide' : 'Show'}
                 </button>
                 <button
                   onClick={() => deleteMenuItem(item.id)}
-                  className="text-berry"
+                  className="text-berry hover:underline"
                 >
                   Delete
                 </button>
@@ -73,16 +96,18 @@ function AdminInner() {
         </tbody>
       </table>
 
-      {/* Add form */}
-      <form onSubmit={handleAdd} className="space-y-3 bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold text-cocoa">Add item</h2>
+      {/* Add / edit form */}
+      <form onSubmit={handleSubmit} className="space-y-3 rounded-xl bg-white p-6 shadow">
+        <h2 className="text-xl font-semibold text-cocoa">
+          {editingId ? 'Edit item' : 'Add item'}
+        </h2>
         <label className="block">
           <span className="text-sm text-cocoa/70">Name</span>
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
-            className="mt-1 w-full border border-caramel/40 rounded px-3 py-2"
+            className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
           />
         </label>
         <label className="block">
@@ -90,7 +115,7 @@ function AdminInner() {
           <input
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="mt-1 w-full border border-caramel/40 rounded px-3 py-2"
+            className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
           />
         </label>
         <label className="block">
@@ -99,7 +124,7 @@ function AdminInner() {
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
             required
-            className="mt-1 w-full border border-caramel/40 rounded px-3 py-2"
+            className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
           />
         </label>
         <label className="block">
@@ -110,7 +135,7 @@ function AdminInner() {
             value={form.price}
             onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
             required
-            className="mt-1 w-full border border-caramel/40 rounded px-3 py-2"
+            className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
           />
         </label>
         <label className="block">
@@ -119,15 +144,26 @@ function AdminInner() {
             type="number"
             value={form.sortOrder}
             onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-            className="mt-1 w-full border border-caramel/40 rounded px-3 py-2"
+            className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
           />
         </label>
-        <button
-          type="submit"
-          className="w-full py-2 rounded bg-cocoa text-cream font-semibold"
-        >
-          Add item
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            className="flex-1 rounded bg-cocoa py-2 font-semibold text-cream"
+          >
+            {editingId ? 'Save changes' : 'Add item'}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded border border-cocoa/30 px-4 py-2 font-semibold text-cocoa"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </main>
   )

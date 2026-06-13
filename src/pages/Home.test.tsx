@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import type { MenuItem } from '../lib/menuTypes'
 
 const items: MenuItem[] = [
@@ -11,16 +12,36 @@ vi.mock('../hooks/useMenu', () => ({
 
 import Home from './Home'
 
+// Home renders <Nav> which uses react-router <Link>, so it needs a Router.
+function renderHome() {
+  return render(
+    <MemoryRouter>
+      <Home />
+    </MemoryRouter>,
+  )
+}
+
 describe('Home', () => {
   it('renders the business name and the live menu', () => {
-    render(<Home />)
+    renderHome()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/sam's sweet/i)
     expect(screen.getByText('Latte')).toBeInTheDocument()
   })
 
-  it('renders an order-ahead link to Toast', () => {
-    render(<Home />)
-    const link = screen.getByRole('link', { name: /order ahead/i })
-    expect(link).toHaveAttribute('href', expect.stringContaining('toast'))
+  it('shows the Pine Grove location and hours', () => {
+    renderHome()
+    expect(screen.getAllByText(/pine grove/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/5am/i).length).toBeGreaterThan(0)
+  })
+
+  it('links to Instagram and Facebook', () => {
+    renderHome()
+    expect(screen.getByRole('link', { name: /instagram/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /facebook/i })).toBeInTheDocument()
+  })
+
+  it('no longer shows an order-ahead link (disabled for now)', () => {
+    renderHome()
+    expect(screen.queryByRole('link', { name: /order ahead/i })).not.toBeInTheDocument()
   })
 })
