@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fff7ef;
+  --color-cocoa: #5b3a29;
+  --color-caramel: #c98a4b;
+  --color-berry: #d4607a;
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; background: var(--color-cream); color: var(--color-cocoa); }
