@@ -1,1 +1,4 @@
-notes.md
+scratch
+node_modules
+dist
+*.local
