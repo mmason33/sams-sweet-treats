@@ -19,15 +19,15 @@ describe('App routing', () => {
   it('renders Home at /', () => {
     navigate('/')
     render(<App />)
-    expect(screen.getByRole('link', { name: /order ahead/i })).toBeInTheDocument()
+    expect(screen.getByText('Our Story')).toBeInTheDocument()
   })
 
   it('renders the TV menu at /tv — a distinct page from Home and Admin', () => {
     navigate('/tv')
     render(<App />)
     expect(screen.getByText('Latte')).toBeInTheDocument()
-    // Order-ahead link is Home-only; "Menu Admin" is Admin-only.
-    expect(screen.queryByRole('link', { name: /order ahead/i })).not.toBeInTheDocument()
+    // "Our Story" is Home-only; "Menu Admin" is Admin-only.
+    expect(screen.queryByText('Our Story')).not.toBeInTheDocument()
     expect(screen.queryByText('Menu Admin')).not.toBeInTheDocument()
   })
 

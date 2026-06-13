@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { MenuItem } from '../lib/menuTypes'
@@ -24,6 +24,10 @@ vi.mock('../lib/menu', () => ({
 import Admin from './Admin'
 
 describe('Admin', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('lists existing items including their availability', () => {
     render(<Admin />)
     expect(screen.getByText('Latte')).toBeInTheDocument()
@@ -53,5 +57,24 @@ describe('Admin', () => {
     render(<Admin />)
     await user.click(screen.getByRole('button', { name: /delete/i }))
     expect(deleteMenuItem).toHaveBeenCalledWith('1')
+  })
+
+  it('edits an existing item through the form', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    // Click Edit on the existing row — the form loads that item.
+    await user.click(screen.getByRole('button', { name: /^edit$/i }))
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Latte')
+    // Change the price and save.
+    const price = screen.getByLabelText(/price/i)
+    await user.clear(price)
+    await user.type(price, '6')
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+    expect(updateMenuItem).toHaveBeenCalledWith(
+      '1',
+      expect.objectContaining({ name: 'Latte', category: 'Coffee', price: 6 }),
+    )
+    // addMenuItem must NOT be called when editing.
+    expect(addMenuItem).not.toHaveBeenCalled()
   })
 })
