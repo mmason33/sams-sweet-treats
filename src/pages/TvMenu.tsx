@@ -9,7 +9,7 @@ export default function TvMenu() {
     <main className="min-h-screen bg-cocoa text-cream p-10">
       <div className="flex items-center gap-6 mb-10">
         <img
-          src="./images/sams-logo.jpg"
+          src={`${import.meta.env.BASE_URL}images/sams-logo.jpg`}
           alt=""
           className="w-24 h-24 rounded-full object-cover"
         />

@@ -25,7 +25,7 @@ export default function Home() {
       {/* Hero */}
       <header className="flex flex-col items-center text-center gap-4 py-12 px-6 bg-cocoa text-cream">
         <img
-          src="./images/sams-logo.jpg"
+          src={`${import.meta.env.BASE_URL}images/sams-logo.jpg`}
           alt="Sam's Sweet Treats & Coffee logo"
           className="w-40 h-40 rounded-full object-cover shadow-lg"
         />
@@ -63,7 +63,7 @@ export default function Home() {
         {photos.map((p) => (
           <img
             key={p}
-            src={`./images/${p}`}
+            src={`${import.meta.env.BASE_URL}images/${p}`}
             alt=""
             className="aspect-square w-full object-cover rounded-lg"
           />
