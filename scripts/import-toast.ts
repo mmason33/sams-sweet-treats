@@ -8,9 +8,14 @@
  * the smallest size + price in the trailing SKU/PLU columns (e.g. "Small,$5.00").
  *
  * Usage:
- *   npx tsx scripts/import-toast.ts --dry-run     # parse + write preview JSON, no Firebase
- *   ADMIN_EMAIL=.. ADMIN_PASSWORD=.. npx tsx scripts/import-toast.ts            # push (skips if collection non-empty)
- *   ADMIN_EMAIL=.. ADMIN_PASSWORD=.. npx tsx scripts/import-toast.ts --replace  # delete existing, then push
+ *   npx tsx scripts/import-toast.ts --dry-run   # parse + write preview JSON, no Firebase
+ *   npx tsx scripts/import-toast.ts             # wipe menuItems, then push (Admin SDK)
+ *
+ * The real push uses the Firebase Admin SDK (writes bypass security rules, so no
+ * login is needed). It authenticates with a service-account key: either set
+ * GOOGLE_APPLICATION_CREDENTIALS to its path, or drop the JSON in the repo root
+ * as serviceAccountKey.json (gitignored). Get one from the Firebase console:
+ * Project settings > Service accounts > Generate new private key.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -152,30 +157,37 @@ async function main() {
     return
   }
 
-  // Real import (deferred require keeps Firebase out of the dry-run path).
-  const { signInWithEmailAndPassword } = await import('firebase/auth')
-  const { collection, addDoc, getDocs, deleteDoc } = await import('firebase/firestore')
-  const { auth, db } = await import('../src/lib/firebase')
+  // Real import via the Admin SDK (deferred import keeps it out of dry-run).
+  const { initializeApp, cert, applicationDefault } = await import('firebase-admin/app')
+  const { getFirestore } = await import('firebase-admin/firestore')
 
-  const email = process.env.ADMIN_EMAIL
-  const password = process.env.ADMIN_PASSWORD
-  if (!email || !password) throw new Error('Set ADMIN_EMAIL and ADMIN_PASSWORD env vars')
-  await signInWithEmailAndPassword(auth, email, password)
+  const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || join(here, '..', 'serviceAccountKey.json')
+  let credential
+  try {
+    credential = cert(JSON.parse(readFileSync(keyPath, 'utf8')))
+  } catch {
+    console.log(
+      `No service-account key found at ${keyPath}.\n` +
+        'Falling back to application default credentials. To use a key, download one from\n' +
+        'Firebase console > Project settings > Service accounts and save it as serviceAccountKey.json.',
+    )
+    credential = applicationDefault()
+  }
+  initializeApp({ credential, projectId: 'samssweet' })
+  const db = getFirestore()
 
-  const existing = await getDocs(collection(db, 'menuItems'))
+  const col = db.collection('menuItems')
+  const existing = await col.get()
   if (!existing.empty) {
-    if (!process.argv.includes('--replace')) {
-      console.log(`menuItems already has ${existing.size} docs — pass --replace to overwrite. Aborting.`)
-      return
-    }
-    console.log(`Deleting ${existing.size} existing docs…`)
-    for (const d of existing.docs) await deleteDoc(d.ref)
+    console.log(`Wiping ${existing.size} existing docs…`)
+    const batch = db.batch()
+    existing.docs.forEach((d) => batch.delete(d.ref))
+    await batch.commit()
   }
-  for (const item of items) {
-    await addDoc(collection(db, 'menuItems'), item)
-    console.log(`Added ${item.name}`)
-  }
-  console.log('\nImport complete.')
+  const writer = db.batch()
+  for (const item of items) writer.set(col.doc(), item)
+  await writer.commit()
+  console.log(`\nImport complete — wrote ${items.length} items.`)
   process.exit(0)
 }
 
