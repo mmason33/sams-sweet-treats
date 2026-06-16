@@ -1,5 +1,6 @@
 import { useMenu } from '../hooks/useMenu'
 import MenuList from '../components/MenuList'
+import Gallery from '../components/Gallery'
 import Nav from '../components/Nav'
 import { MapPinIcon, ClockIcon } from '../components/icons'
 
@@ -9,12 +10,25 @@ const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 const ORDER_URL = 'https://order.toasttab.com/online/sam-s-sweet-treats-and-coffee-19660-ca-88'
 
 const galleryPhotos = [
+  'sam-family.jpg',
   'sam-cinnamon-rolls.jpg',
+  'IMG_7959.jpeg',
   'sam-treat-1.jpg',
+  'sams-trail-2.jpg',
+  'IMG_7969.jpeg',
   'sam-treat-2.jpg',
   'sam-treat-3.jpg',
+  'IMG_7977.jpeg',
   'sam-treat-4.jpg',
+  'IMG_7979.jpeg',
+  'sam-treat-5.jpg',
   'sam-treat-6.jpg',
+  'IMG_7981.jpeg',
+  'IMG_8018.jpeg',
+  '80287474360__6AC78E06-E869-484A-9D7E-170B2E10A394.fullsizerender.jpeg',
+  '80289300598__7F346C94-0716-48CA-AFF7-D7C73114F1EB.fullsizerender.jpeg',
+  '80289390637__7BD6774C-43EB-434E-9E35-C679CA63E861.fullsizerender.jpeg',
+  '80297303124__736061AB-67C0-48AA-AA0E-61FED264DC88.jpeg',
 ]
 
 export default function Home() {
@@ -69,13 +83,28 @@ export default function Home() {
       </header>
 
       {/* Story */}
-      <section className="mx-auto max-w-2xl px-6 py-12 text-center">
+      <section className="mx-auto max-w-2xl space-y-4 px-6 py-12 text-center">
         <h2 className="font-display text-3xl text-berry">Our Story</h2>
-        <p className="mt-4 text-lg leading-relaxed text-cocoa/80">
-          Sam has always loved baking. What started as treats for friends and
-          family grew into a small business on wheels — and a whole lot of happy
-          regulars. Every cinnamon roll, muffin, and cup of coffee is made fresh
-          with care, right here in Pine Grove.
+        <p className="text-lg leading-relaxed text-cocoa/80">
+          Welcome to Sam's Sweet Treats and Coffee! We're a family-owned and
+          operated coffee and dessert trailer proudly serving the community
+          we've called home our entire lives. What started as a dream has grown
+          into a place where friends, families, and neighbors can gather to
+          enjoy handcrafted coffee, delicious sweet treats, and small-town
+          hospitality.
+        </p>
+        <p className="text-lg leading-relaxed text-cocoa/80">
+          At Sam's Sweet Treats and Coffee, we believe the best memories are
+          made over great conversations, a fresh cup of coffee, and something
+          sweet to share. As local residents who grew up right here in the
+          county, we're honored to serve the community that has supported us
+          throughout the years.
+        </p>
+        <p className="text-lg leading-relaxed text-cocoa/80">
+          Whether you're stopping by for your morning coffee, an afternoon
+          pick-me-up, or a special treat, we look forward to welcoming you with
+          a smile and making you feel like part of our family. Thank you for
+          supporting local, family-run businesses. We can't wait to serve you!
         </p>
       </section>
 
@@ -91,17 +120,7 @@ export default function Home() {
 
       {/* Gallery */}
       <section className="mx-auto max-w-4xl px-6 pb-16">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {galleryPhotos.map((p) => (
-            <img
-              key={p}
-              src={`${import.meta.env.BASE_URL}images/${p}`}
-              alt=""
-              loading="lazy"
-              className="aspect-square w-full rounded-2xl object-cover shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
-            />
-          ))}
-        </div>
+        <Gallery photos={galleryPhotos} />
       </section>
 
       {/* Footer */}

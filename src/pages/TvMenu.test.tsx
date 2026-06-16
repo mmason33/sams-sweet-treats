@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import type { MenuItem } from '../lib/menuTypes'
 
@@ -13,10 +13,25 @@ vi.mock('../hooks/useMenu', () => ({
 import TvMenu from './TvMenu'
 
 describe('TvMenu', () => {
+  afterEach(() => {
+    delete (document.documentElement as { requestFullscreen?: unknown }).requestFullscreen
+  })
+
   it('shows available items and hides unavailable ones', () => {
     render(<TvMenu />)
     expect(screen.getByText('Latte')).toBeInTheDocument()
     expect(screen.getByText('$4.50')).toBeInTheDocument()
     expect(screen.queryByText('Old Brew')).not.toBeInTheDocument()
+  })
+
+  it('hides the fullscreen toggle where the API is unsupported', () => {
+    render(<TvMenu />)
+    expect(screen.queryByRole('button', { name: /fullscreen/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a fullscreen toggle when the browser supports it', () => {
+    document.documentElement.requestFullscreen = vi.fn().mockResolvedValue(undefined)
+    render(<TvMenu />)
+    expect(screen.getByRole('button', { name: /enter fullscreen/i })).toBeInTheDocument()
   })
 })

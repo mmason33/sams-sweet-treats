@@ -1,0 +1,19 @@
+{
+  "name": "Sam's Sweet Treats & Coffee",
+  "short_name": "Sam's Menu",
+  "description": "Live menu board for Sam's Sweet Treats & Coffee.",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#3f2a21",
+  "theme_color": "#3f2a21",
+  "start_url": "tv",
+  "scope": ".",
+  "icons": [
+    {
+      "src": "images/sams-logo-icons.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
