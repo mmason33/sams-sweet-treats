@@ -13,12 +13,57 @@
   --color-berry: #db5e80;
   --color-caramel: #cf9352;
   --color-cocoa: #3f2a21;
+
+  /* Fonts sampled from the logo:
+     display = brush script ("Sam's Sweet")
+     sans    = rounded geometric sans ("TREATS AND COFFEE"), used for everything else */
+  --font-sans: "Nunito", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Pacifico", "Nunito", ui-sans-serif, system-ui, cursive;
 }
 
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  background: var(--color-cream);
+  /* Faint coffee/treat line-art texture echoing the trailer wrap. */
+  background-color: var(--color-cream);
+  background-image: url('./assets/pattern-coffee.svg');
+  background-size: 260px 260px;
+  background-repeat: repeat;
   color: var(--color-cocoa);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Header background, stacked top-to-bottom:
+   1. coffee line-art pattern (so the SVGs show in the header too)
+   2. a fade to cream at the bottom (melts into the page — no hard seam)
+   3. the drifting brand gradient (only this layer animates)
+   Distinct pastel stops + wide travel make the motion visible, but it stays
+   light enough to read the dark header text over. */
+@keyframes brand-pan {
+  0%   { background-position: 0 0, 0 0, 0% 50%; }
+  50%  { background-position: 0 0, 0 0, 100% 50%; }
+  100% { background-position: 0 0, 0 0, 0% 50%; }
+}
+.brand-gradient {
+  background-color: var(--color-cream);
+  background-image:
+    url('./assets/pattern-coffee.svg'),
+    linear-gradient(to bottom, transparent 60%, var(--color-cream) 100%),
+    linear-gradient(
+      115deg,
+      var(--color-blush) 0%,
+      color-mix(in srgb, var(--color-berry) 40%, white) 22%,
+      var(--color-cream) 44%,
+      color-mix(in srgb, var(--color-caramel) 35%, white) 66%,
+      var(--color-blush) 88%,
+      color-mix(in srgb, var(--color-berry) 40%, white) 100%
+    );
+  background-size: 260px 260px, 100% 100%, 300% 300%;
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-position: 0 0, 0 0, 0% 50%;
+  animation: brand-pan 16s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-gradient { animation: none; }
 }

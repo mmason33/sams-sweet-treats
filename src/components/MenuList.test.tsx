@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import MenuList from './MenuList'
 import type { MenuItem } from '../lib/menuTypes'
 
@@ -10,14 +11,32 @@ const items: MenuItem[] = [
 ]
 
 describe('MenuList', () => {
-  it('renders available items grouped by category and hides unavailable', () => {
+  it('opens on the first category and hides unavailable items', () => {
     render(<MenuList items={items} />)
-    expect(screen.getByRole('heading', { name: 'Coffee' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Treats' })).toBeInTheDocument()
+    // Filter pills for All + each category
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Coffee' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Treats' })).toBeInTheDocument()
+    // Default shows the first category only
+    expect(screen.getByText('Latte')).toBeInTheDocument()
+    expect(screen.queryByText('Drip')).not.toBeInTheDocument()
+    expect(screen.queryByText('Cinnamon Roll')).not.toBeInTheDocument()
+  })
+
+  it('filters to a category when its pill is tapped', async () => {
+    const user = userEvent.setup()
+    render(<MenuList items={items} />)
+    await user.click(screen.getByRole('button', { name: 'Treats' }))
+    expect(screen.getByText('Cinnamon Roll')).toBeInTheDocument()
+    expect(screen.queryByText('Latte')).not.toBeInTheDocument()
+  })
+
+  it('shows every category when All is tapped', async () => {
+    const user = userEvent.setup()
+    render(<MenuList items={items} />)
+    await user.click(screen.getByRole('button', { name: 'All' }))
     expect(screen.getByText('Latte')).toBeInTheDocument()
     expect(screen.getByText('Cinnamon Roll')).toBeInTheDocument()
-    // unavailable "Drip" is hidden
-    expect(screen.queryByText('Drip')).not.toBeInTheDocument()
   })
 
   it('shows an empty message when nothing is available', () => {
