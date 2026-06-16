@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useMenu } from '../hooks/useMenu'
+import { useFullscreen } from '../hooks/useFullscreen'
+import { useWakeLock } from '../hooks/useWakeLock'
+import { useIdleCursor } from '../hooks/useIdleCursor'
+import { ExpandIcon, CompressIcon } from '../components/icons'
 import {
   availableItems,
   groupByCategory,
@@ -8,14 +12,18 @@ import {
   formatPrice,
 } from '../lib/menuUtils'
 
-const ROTATE_MS = 10000
-const ITEMS_PER_BOARD = 14 // ~7 per column across two columns
+const ROTATE_MS = 7500
+const ITEMS_PER_BOARD = 16 // ~7 per column across two columns
 
 export default function TvMenu() {
   const { items, loading } = useMenu()
   const groups = orderGroups(groupByCategory(availableItems(items)))
   const boards = paginateGroups(groups, ITEMS_PER_BOARD)
   const [page, setPage] = useState(0)
+
+  const { isFullscreen, supported: fullscreenSupported, toggle: toggleFullscreen } = useFullscreen()
+  const cursorIdle = useIdleCursor(4000)
+  useWakeLock(true) // keep the TV screen from dimming/sleeping
 
   // Advance through the boards on a timer; restart if the board count shrinks.
   useEffect(() => {
@@ -27,7 +35,25 @@ export default function TvMenu() {
   const current = boards[Math.min(page, Math.max(boards.length - 1, 0))] ?? []
 
   return (
-    <main className="flex min-h-screen flex-col bg-cocoa p-10 text-cream">
+    <main
+      className={
+        'flex min-h-screen flex-col bg-cocoa p-10 text-cream ' +
+        (cursorIdle ? 'cursor-none' : '')
+      }
+    >
+      {fullscreenSupported && (
+        <button
+          onClick={toggleFullscreen}
+          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          className={
+            'fixed right-5 top-5 z-10 grid h-12 w-12 place-items-center rounded-full bg-cream/10 text-cream transition hover:bg-cream/20 ' +
+            (cursorIdle ? 'pointer-events-none opacity-0' : 'opacity-100')
+          }
+        >
+          {isFullscreen ? <CompressIcon className="h-6 w-6" /> : <ExpandIcon className="h-6 w-6" />}
+        </button>
+      )}
+
       <div className="mb-8 flex items-center gap-6">
         <img
           src={`${import.meta.env.BASE_URL}images/sams-logo-icons.png`}
@@ -41,20 +67,34 @@ export default function TvMenu() {
         <p className="text-4xl">Loading…</p>
       ) : (
         <>
-          <div className="grid flex-1 auto-rows-min grid-cols-2 gap-x-16 gap-y-8 content-start">
-            {current.map((group) => (
-              <section key={group.category} className="break-inside-avoid">
-                <h2 className="mb-3 text-4xl font-bold text-blush">{group.category}</h2>
-                <ul className="space-y-2">
-                  {group.items.map((item) => (
-                    <li key={item.id} className="flex justify-between gap-6 text-3xl">
-                      <span>{item.name}</span>
-                      <span className="font-semibold text-caramel">{formatPrice(item.price)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
+          {/* Center the board vertically so sparse slides don't bottom-out.
+              CSS columns: whole categories flow down one column then the next
+              (break-inside-avoid keeps a category intact). */}
+          <div className="flex flex-1 flex-col justify-center">
+            <div className="columns-2 gap-x-16 [&>section]:mb-10 [&>section]:break-inside-avoid">
+              {current.map((group) => (
+                <section key={group.category}>
+                  <h2 className="mb-4 text-4xl font-bold tracking-tight text-blush">
+                    {group.category}
+                  </h2>
+                  <ul className="space-y-3">
+                    {group.items.map((item) => (
+                      <li key={item.id} className="flex items-end gap-2 text-3xl">
+                        <span className="leading-tight">{item.name}</span>
+                        {/* dotted leader fills the gap between name and price */}
+                        <span
+                          aria-hidden="true"
+                          className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
+                        />
+                        <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
+                          {formatPrice(item.price)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
           </div>
 
           {/* Board progress dots */}
