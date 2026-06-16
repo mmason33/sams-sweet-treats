@@ -15,19 +15,14 @@ const galleryPhotos = [
   'IMG_7959.jpeg',
   'sam-treat-1.jpg',
   'sams-trail-2.jpg',
-  'IMG_7969.jpeg',
   'sam-treat-2.jpg',
   'sam-treat-3.jpg',
-  'IMG_7977.jpeg',
   'sam-treat-4.jpg',
   'IMG_7979.jpeg',
   'sam-treat-5.jpg',
   'sam-treat-6.jpg',
   'IMG_7981.jpeg',
-  'IMG_8018.jpeg',
   '80287474360__6AC78E06-E869-484A-9D7E-170B2E10A394.fullsizerender.jpeg',
-  '80289300598__7F346C94-0716-48CA-AFF7-D7C73114F1EB.fullsizerender.jpeg',
-  '80289390637__7BD6774C-43EB-434E-9E35-C679CA63E861.fullsizerender.jpeg',
   '80297303124__736061AB-67C0-48AA-AA0E-61FED264DC88.jpeg',
 ]
 
@@ -87,7 +82,7 @@ export default function Home() {
         <h2 className="font-display text-3xl text-berry">Our Story</h2>
         <p className="text-lg leading-relaxed text-cocoa/80">
           Welcome to Sam's Sweet Treats and Coffee! We're a family-owned and
-          operated coffee and dessert trailer proudly serving the community
+          operated coffee and pastries trailer proudly serving the community
           we've called home our entire lives. What started as a dream has grown
           into a place where friends, families, and neighbors can gather to
           enjoy handcrafted coffee, delicious sweet treats, and small-town
