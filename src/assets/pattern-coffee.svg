@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+  <!-- Tone-on-tone line-art motifs echoing the trailer wrap. Kept very low
+       opacity so it textures the background without hurting readability.
+       One motif per quadrant so the tile repeats seamlessly (no edge clipping). -->
+  <g fill="none" stroke="#3f2a21" stroke-opacity="0.022" stroke-width="3"
+     stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- Coffee cup + saucer + steam (top-left) -->
+    <g transform="translate(65 65) rotate(-8)">
+      <path d="M -18 -4 h 30 v 12 a 15 15 0 0 1 -30 0 z" />
+      <path d="M 12 0 a 9 9 0 0 1 0 12" />
+      <path d="M -24 14 h 42" />
+      <path d="M -8 -14 q 5 -6 0 -12" />
+      <path d="M 2 -14 q 5 -6 0 -12" />
+    </g>
+
+    <!-- Coffee carafe (top-right) -->
+    <g transform="translate(195 65) rotate(6)">
+      <path d="M -9 -22 h 18" />
+      <path d="M -7 -22 v -4 h 14 v 4" />
+      <path d="M -12 -16 h 24 l 4 26 a 16 16 0 0 1 -32 0 z" />
+      <path d="M 16 -10 q 13 5 6 22" />
+      <path d="M -8 0 h 16" />
+    </g>
+
+    <!-- Cinnamon roll swirl (bottom-left) -->
+    <g transform="translate(65 195)">
+      <circle cx="0" cy="0" r="22" />
+      <path d="M 0 -13 a 13 13 0 1 1 -9 4 a 8 8 0 1 1 6 2" />
+    </g>
+
+    <!-- Cupcake (bottom-right) -->
+    <g transform="translate(195 195) rotate(-4)">
+      <path d="M -16 2 h 32 l -5 22 h -22 z" />
+      <path d="M -16 2 h 32" />
+      <path d="M -14 2 q 3 -16 14 -16 q 11 0 14 16" />
+      <path d="M -7 -6 q 7 -8 15 -2" />
+    </g>
+  </g>
+</svg>

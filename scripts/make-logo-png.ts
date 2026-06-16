@@ -5,12 +5,13 @@
 // (connected to the edge) transparent. The black outlines act as walls, so the
 // enclosed white cup/saucer are preserved.
 //
-// Run: npx tsx scripts/make-logo-png.ts
+// Run: npx tsx scripts/make-logo-png.ts [src] [out]
+//   defaults: public/images/sams-logo.jpg -> public/images/sams-logo.png
 import Jimp from 'jimp'
 import path from 'node:path'
 
-const SRC = path.resolve('public/images/sams-logo.jpg')
-const OUT = path.resolve('public/images/sams-logo.png')
+const SRC = path.resolve(process.argv[2] ?? 'public/images/sams-logo.jpg')
+const OUT = path.resolve(process.argv[3] ?? 'public/images/sams-logo.png')
 const THRESHOLD = 230 // a pixel is "background white" if every channel >= this
 
 const img = await Jimp.read(SRC)
@@ -55,5 +56,34 @@ while (stack.length) {
   visit(x, y - 1)
 }
 
+// Optional cleanup pass for the icon-only logo: drop small disconnected opaque
+// blobs (stray artifacts) and crop away the transparent margin.
+if (process.argv.includes('--despeckle')) {
+  const MIN_AREA = Math.round(width * height * 0.001)
+  const seen = new Uint8Array(width * height)
+  const isOpaque = (i: number) => data[i * 4 + 3] > 0
+  for (let start = 0; start < width * height; start++) {
+    if (seen[start] || !isOpaque(start)) continue
+    const comp: number[] = [start]
+    const queue: number[] = [start]
+    seen[start] = 1
+    while (queue.length) {
+      const idx = queue.pop() as number
+      const x = idx % width
+      const y = (idx - x) / width
+      for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
+        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+        const nidx = ny * width + nx
+        if (seen[nidx] || !isOpaque(nidx)) continue
+        seen[nidx] = 1
+        comp.push(nidx)
+        queue.push(nidx)
+      }
+    }
+    if (comp.length < MIN_AREA) for (const idx of comp) data[idx * 4 + 3] = 0
+  }
+  img.autocrop()
+}
+
 await img.writeAsync(OUT)
-console.log(`Wrote ${OUT} (${width}x${height}, exterior white made transparent)`)
+console.log(`Wrote ${OUT} (${img.bitmap.width}x${img.bitmap.height}, exterior white made transparent)`)

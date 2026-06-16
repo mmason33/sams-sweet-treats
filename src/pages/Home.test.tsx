@@ -40,8 +40,11 @@ describe('Home', () => {
     expect(screen.getByRole('link', { name: /facebook/i })).toBeInTheDocument()
   })
 
-  it('no longer shows an order-ahead link (disabled for now)', () => {
+  it('links to the Toast online ordering page', () => {
     renderHome()
-    expect(screen.queryByRole('link', { name: /order ahead/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /order online/i })).toHaveAttribute(
+      'href',
+      expect.stringContaining('order.toasttab.com'),
+    )
   })
 })

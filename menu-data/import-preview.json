@@ -1,0 +1,570 @@
+[
+  {
+    "name": "Americano",
+    "description": "",
+    "price": 4,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Brewed Coffee",
+    "description": "",
+    "price": 3.5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Cappuccino",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Carmel Macchiato",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Flavored Latte",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Latte",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Mocha",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 6
+  },
+  {
+    "name": "White Mocha",
+    "description": "",
+    "price": 5,
+    "category": "Hot Coffee",
+    "available": true,
+    "sortOrder": 7
+  },
+  {
+    "name": "Cold Brew",
+    "description": "",
+    "price": 5,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Iced Americano",
+    "description": "",
+    "price": 4.5,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Iced Carmel Macchiato",
+    "description": "",
+    "price": 5,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Iced Coffee",
+    "description": "",
+    "price": 4,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Iced Flavored Latte",
+    "description": "",
+    "price": 6,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Iced Latte",
+    "description": "",
+    "price": 5.5,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Iced Midnight Mocha",
+    "description": "",
+    "price": 5,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 6
+  },
+  {
+    "name": "Iced Mocha",
+    "description": "",
+    "price": 6,
+    "category": "Iced Coffee",
+    "available": true,
+    "sortOrder": 7
+  },
+  {
+    "name": "Affogato",
+    "description": "",
+    "price": 5.5,
+    "category": "Specialty",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Chai",
+    "description": "",
+    "price": 3.95,
+    "category": "Specialty",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Hot Matcha Latte",
+    "description": "",
+    "price": 5.5,
+    "category": "Matcha",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Iced Matcha Latte",
+    "description": "",
+    "price": 5,
+    "category": "Matcha",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Blended Latte",
+    "description": "",
+    "price": 6,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Blended Matcha",
+    "description": "",
+    "price": 6.5,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Caramel Frappe",
+    "description": "",
+    "price": 6.5,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Mocha Frappe",
+    "description": "",
+    "price": 6.5,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Non coffee Frappe",
+    "description": "",
+    "price": 5,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Vanilla Bean Frappe",
+    "description": "",
+    "price": 6,
+    "category": "Blended & Frappes",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Green Smoothie",
+    "description": "",
+    "price": 6.5,
+    "category": "Smoothies",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Mango Pineapple",
+    "description": "",
+    "price": 6.5,
+    "category": "Smoothies",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Mixed Berry",
+    "description": "",
+    "price": 6.5,
+    "category": "Smoothies",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Smoothie",
+    "description": "",
+    "price": 6.5,
+    "category": "Smoothies",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Strawberry Banana",
+    "description": "",
+    "price": 6.5,
+    "category": "Smoothies",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Classic Hot Chocolate",
+    "description": "",
+    "price": 4.5,
+    "category": "Hot Chocolate",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Peppermint Hot Chocolate (seasonal)",
+    "description": "",
+    "price": 5.5,
+    "category": "Hot Chocolate",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "White Hot Chocolate",
+    "description": "",
+    "price": 5,
+    "category": "Hot Chocolate",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Classic Energy Drink",
+    "description": "",
+    "price": 4.5,
+    "category": "Energy",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Cream Energy Blend",
+    "description": "",
+    "price": 6,
+    "category": "Energy",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Flavored Energy Spritzer",
+    "description": "",
+    "price": 5.5,
+    "category": "Energy",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Hot tea",
+    "description": "",
+    "price": 2.95,
+    "category": "Tea & Lemonade",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Iced Tea",
+    "description": "",
+    "price": 3.95,
+    "category": "Tea & Lemonade",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Refreshers",
+    "description": "",
+    "price": 4.5,
+    "category": "Refreshers",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Dirty Soda",
+    "description": "",
+    "price": 4.5,
+    "category": "Dirty Soda",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Cinnamon Roll",
+    "description": "",
+    "price": 4.5,
+    "category": "Pastries",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Cinnamon Streusel",
+    "description": "",
+    "price": 3.75,
+    "category": "Pastries",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Croissant",
+    "description": "",
+    "price": 3.5,
+    "category": "Pastries",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Ham & Cheese Croissant",
+    "description": "",
+    "price": 5.5,
+    "category": "Pastries",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Strawberry Croissant",
+    "description": "",
+    "price": 4.5,
+    "category": "Pastries",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Blueberry Muffin",
+    "description": "",
+    "price": 3.95,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Chocolate Chip Scone",
+    "description": "",
+    "price": 3.75,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Double Chocolate Chip Muffin",
+    "description": "",
+    "price": 3.95,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Gluten Free Chocolate Muffin",
+    "description": "",
+    "price": 4.25,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Ham & Cheese Scallion Scone",
+    "description": "",
+    "price": 4.5,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Muffin",
+    "description": "",
+    "price": 3.95,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Scone",
+    "description": "",
+    "price": 3.75,
+    "category": "Muffins & Scones",
+    "available": true,
+    "sortOrder": 6
+  },
+  {
+    "name": "Brown Sugar Sugar Cookie",
+    "description": "",
+    "price": 3,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Brownie",
+    "description": "",
+    "price": 3.95,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Chocolate Chip Cookie",
+    "description": "",
+    "price": 3,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Chocolate Chip with peanut butter chocolate Ganache",
+    "description": "",
+    "price": 4.5,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Lemon Bar",
+    "description": "",
+    "price": 4.95,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Oatmeal Cookie",
+    "description": "",
+    "price": 3,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Seasonal Bar",
+    "description": "",
+    "price": 3.75,
+    "category": "Cookies & Bars",
+    "available": true,
+    "sortOrder": 6
+  },
+  {
+    "name": "Coffee Cake",
+    "description": "",
+    "price": 4.5,
+    "category": "Cakes & Sweets",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Keylime Loaf cake",
+    "description": "",
+    "price": 3.5,
+    "category": "Cakes & Sweets",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Mini Lemon Cakes with Lavender Glaze",
+    "description": "",
+    "price": 3.5,
+    "category": "Cakes & Sweets",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Raspberry Pound Cake with Lemon Glaze",
+    "description": "",
+    "price": 4.5,
+    "category": "Cakes & Sweets",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Biscuits & Gravy",
+    "description": "",
+    "price": 7.5,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "Breakfast Burrito",
+    "description": "",
+    "price": 7.5,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 1
+  },
+  {
+    "name": "Breakfast Sandwich",
+    "description": "",
+    "price": 6.5,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 2
+  },
+  {
+    "name": "Egg Bites",
+    "description": "",
+    "price": 3.99,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 3
+  },
+  {
+    "name": "Oatmeal",
+    "description": "",
+    "price": 3.5,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 4
+  },
+  {
+    "name": "Spinach & Cheese Quiche",
+    "description": "",
+    "price": 4.99,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 5
+  },
+  {
+    "name": "Yogurt Parfait",
+    "description": "",
+    "price": 5.5,
+    "category": "Breakfast",
+    "available": true,
+    "sortOrder": 6
+  }
+]

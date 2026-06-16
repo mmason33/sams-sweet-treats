@@ -1,23 +1,21 @@
 import { Link } from 'react-router-dom'
 import { InstagramIcon, FacebookIcon } from './icons'
 
-// TODO: replace with Sam's real social handles when available.
-const INSTAGRAM_URL = 'https://instagram.com/'
-const FACEBOOK_URL = 'https://facebook.com/'
-const LOGO = `${import.meta.env.BASE_URL}images/sams-logo.png`
+const INSTAGRAM_URL = 'https://www.instagram.com/samssweettreatsandcoffee/'
+const FACEBOOK_URL = 'https://www.facebook.com/samssweettreatsandcoffee'
+const LOGO = `${import.meta.env.BASE_URL}images/sams-logo-icons.png`
 
 // Floating "Dynamic Island"-style pill nav, fixed at the top-center.
 export default function Nav() {
   return (
     <nav className="fixed inset-x-0 top-3 z-50 flex justify-center px-3">
       <div className="flex items-center gap-2 rounded-full border border-white/10 bg-cocoa/95 px-3 py-2 text-cream shadow-xl shadow-cocoa/30 backdrop-blur-md">
-        <Link to="/" className="flex items-center gap-2 rounded-full pl-1 pr-1">
+        <Link to="/" aria-label="Sam's Sweet Treats & Coffee — home" className="flex items-center rounded-full">
           <img
             src={LOGO}
             alt="Sam's Sweet Treats & Coffee"
-            className="h-9 w-9 rounded-full bg-cream object-contain p-0.5"
+            className="h-10 w-10 rounded-full bg-cream object-contain p-1"
           />
-          <span className="hidden text-sm font-bold tracking-wide sm:inline">Sam's Sweet</span>
         </Link>
 
         <span className="mx-1 h-5 w-px bg-cream/20" />

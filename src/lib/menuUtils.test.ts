@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import type { MenuItem } from './menuTypes'
-import { formatPrice, sortItems, groupByCategory, availableItems } from './menuUtils'
+import {
+  formatPrice,
+  sortItems,
+  groupByCategory,
+  availableItems,
+  orderGroups,
+  paginateGroups,
+} from './menuUtils'
 
 const item = (over: Partial<MenuItem>): MenuItem => ({
   id: 'x',
@@ -49,5 +56,32 @@ describe('groupByCategory', () => {
     const groups = groupByCategory([coffee1, treat1, coffee2])
     expect(groups.map((g) => g.category)).toEqual(['Coffee', 'Treats'])
     expect(groups[0].items.map((i) => i.id)).toEqual(['c2', 'c1'])
+  })
+})
+
+describe('orderGroups', () => {
+  it('orders known categories by canonical order, unknown ones last (alphabetical)', () => {
+    const g = (category: string) => ({ category, items: [] })
+    const ordered = orderGroups([g('Pastries'), g('Zebra'), g('Hot Coffee'), g('Apple')])
+    expect(ordered.map((x) => x.category)).toEqual(['Hot Coffee', 'Pastries', 'Apple', 'Zebra'])
+  })
+})
+
+describe('paginateGroups', () => {
+  it('packs whole categories into boards within the item budget', () => {
+    const mk = (category: string, n: number) => ({
+      category,
+      items: Array.from({ length: n }, (_, i) => item({ id: `${category}${i}`, category })),
+    })
+    const pages = paginateGroups([mk('A', 4), mk('B', 4), mk('C', 3)], 7)
+    // A+B = 8 > 7, so B starts a new board; C fits with B (4+3=7).
+    expect(pages.map((p) => p.map((g) => g.category))).toEqual([['A'], ['B', 'C']])
+  })
+
+  it('gives an oversized category its own board', () => {
+    const big = { category: 'Big', items: Array.from({ length: 20 }, (_, i) => item({ id: `b${i}` })) }
+    const pages = paginateGroups([big], 7)
+    expect(pages).toHaveLength(1)
+    expect(pages[0][0].items).toHaveLength(20)
   })
 })
