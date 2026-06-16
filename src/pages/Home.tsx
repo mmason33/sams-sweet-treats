@@ -49,7 +49,7 @@ export default function Home() {
           Sam's Sweet Treats &amp; Coffee
         </h1>
         <p className="mx-auto mt-3 max-w-md text-cocoa/70">
-           Welcome to Sam’s Sweet Treats and Coffee! We’re a family-owned and operated coffee and dessert trailer proudly serving the community we’ve called home our entire lives. What started as a dream has grown into a place where friends, families, and neighbors can gather to enjoy handcrafted coffee, delicious sweet treats, and small-town hospitality. At Sam’s Sweet Treats and Coffee, we believe the best memories are made over great conversations, a fresh cup of coffee, and something sweet to share. As local residents who grew up right here in the county, we’re honored to serve the community that has supported us throughout the years. Whether you’re stopping by for your morning coffee, an afternoon pick-me-up, or a special treat, we look forward to welcoming you with a smile and making you feel like part of our family. Thank you for supporting local, family-run businesses. We can’t wait to serve you!
+          Fresh coffee and handmade treats, served from our little pink trailer.
         </p>
 
         {/* Info chips */}
