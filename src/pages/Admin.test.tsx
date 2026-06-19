@@ -119,4 +119,24 @@ describe('Admin', () => {
     // No drag handles while filtering.
     expect(screen.queryByLabelText(/reorder/i)).not.toBeInTheDocument()
   })
+
+  it('row actions still work in search mode', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    // Filter to Brownie (which is hidden, available: false)
+    await user.type(screen.getByRole('searchbox', { name: /search/i }), 'brown')
+    // Toggle Show button
+    const brownieRow = rowFor('Brownie')
+    await user.click(within(brownieRow).getByRole('button', { name: /show/i }))
+    expect(updateMenuItem).toHaveBeenCalledWith('3', { available: true })
+    vi.clearAllMocks()
+    // Click Delete button
+    await user.click(within(brownieRow).getByRole('button', { name: /delete/i }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText(/are you sure/i)).toBeInTheDocument()
+    expect(deleteMenuItem).not.toHaveBeenCalled()
+    // Confirm delete
+    await user.click(within(dialog).getByRole('button', { name: /delete/i }))
+    expect(deleteMenuItem).toHaveBeenCalledWith('3')
+  })
 })
