@@ -9,10 +9,11 @@ import {
   updateMenuItem,
   deleteMenuItem,
   reorderItems,
+  renameCategoryItems,
 } from '../lib/menu'
 import { saveCategoryOrder } from '../lib/config'
 import { signOutUser } from '../lib/auth'
-import { formatPrice, groupByCategory, orderGroups } from '../lib/menuUtils'
+import { buildCategoryGroups, formatItemPrice } from '../lib/menuUtils'
 import type { MenuItem, NewMenuItem } from '../lib/menuTypes'
 
 const empty: NewMenuItem = {
@@ -24,19 +25,24 @@ const empty: NewMenuItem = {
   sortOrder: 0,
 }
 
+type CatModal = { mode: 'add' | 'rename'; original: string }
+
 function AdminInner() {
   const { items } = useMenu()
-  const { categoryOrder } = useCategoryOrder()
+  const { savedCategories } = useCategoryOrder()
   const [form, setForm] = useState<NewMenuItem>(empty)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<MenuItem | null>(null)
   const [search, setSearch] = useState('')
+  const [catModal, setCatModal] = useState<CatModal | null>(null)
+  const [catName, setCatName] = useState('')
 
   const groups = useMemo(
-    () => orderGroups(groupByCategory(items), categoryOrder),
-    [items, categoryOrder],
+    () => buildCategoryGroups(items, savedCategories),
+    [items, savedCategories],
   )
+  const categoryNames = useMemo(() => groups.map((g) => g.category), [groups])
 
   const query = search.trim().toLowerCase()
   const filtered = useMemo(
@@ -51,7 +57,7 @@ function AdminInner() {
   )
 
   function openAdd() {
-    setForm(empty)
+    setForm({ ...empty, category: categoryNames[0] ?? '' })
     setEditingId(null)
     setFormOpen(true)
   }
@@ -61,6 +67,7 @@ function AdminInner() {
       name: item.name,
       description: item.description,
       price: item.price,
+      largePrice: item.largePrice,
       category: item.category,
       available: item.available,
       sortOrder: item.sortOrder,
@@ -77,15 +84,17 @@ function AdminInner() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    const { largePrice, ...rest } = form
+    const lp = largePrice != null && largePrice > 0 ? largePrice : undefined
     if (editingId) {
-      await updateMenuItem(editingId, form)
+      await updateMenuItem(editingId, { ...rest, largePrice: lp })
     } else {
       // Append the new item to the end of its category.
-      const inCategory = items.filter((i) => i.category === form.category)
+      const inCategory = items.filter((i) => i.category === rest.category)
       const sortOrder = inCategory.length
         ? Math.max(...inCategory.map((i) => i.sortOrder)) + 1
         : 0
-      await addMenuItem({ ...form, sortOrder })
+      await addMenuItem({ ...rest, largePrice: lp, sortOrder })
     }
     closeForm()
   }
@@ -108,6 +117,39 @@ function AdminInner() {
     void updateMenuItem(item.id, { available: !item.available })
   }
 
+  function openAddCategory() {
+    setCatModal({ mode: 'add', original: '' })
+    setCatName('')
+  }
+
+  function openRenameCategory(category: string) {
+    setCatModal({ mode: 'rename', original: category })
+    setCatName(category)
+  }
+
+  async function submitCategory(e: FormEvent) {
+    e.preventDefault()
+    if (!catModal) return
+    const name = catName.trim()
+    // Ignore empty names and collisions with a different existing category.
+    if (!name || (name !== catModal.original && categoryNames.includes(name))) return
+
+    if (catModal.mode === 'add') {
+      await saveCategoryOrder([...categoryNames, name])
+    } else {
+      const original = catModal.original
+      const itemsInCategory = items.filter((i) => i.category === original)
+      if (itemsInCategory.length) await renameCategoryItems(itemsInCategory, name)
+      await saveCategoryOrder(categoryNames.map((c) => (c === original ? name : c)))
+    }
+    setCatModal(null)
+  }
+
+  function deleteCategory(category: string) {
+    // Only reachable for empty categories (the row hides Delete otherwise).
+    void saveCategoryOrder(categoryNames.filter((c) => c !== category))
+  }
+
   return (
     <main className="mx-auto max-w-4xl p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -128,6 +170,14 @@ function AdminInner() {
           className="min-w-0 flex-1 rounded-lg border border-caramel/40 px-4 py-2 focus:border-berry focus:outline-none"
         />
         <button
+          type="button"
+          onClick={openAddCategory}
+          className="rounded-lg border border-cocoa/30 px-4 py-2 font-semibold text-cocoa hover:bg-blush-soft/50"
+        >
+          Add category
+        </button>
+        <button
+          type="button"
           onClick={openAdd}
           className="rounded-lg bg-cocoa px-4 py-2 font-semibold text-cream hover:bg-cocoa/90"
         >
@@ -149,14 +199,14 @@ function AdminInner() {
                 >
                   <span className="flex-1 font-medium text-cocoa">{item.name}</span>
                   <span className="text-cocoa/60">{item.category}</span>
-                  <span className="tabular-nums text-cocoa/70">{formatPrice(item.price)}</span>
-                  <button onClick={() => openEdit(item)} className="text-cocoa hover:underline">
+                  <span className="tabular-nums text-cocoa/70">{formatItemPrice(item)}</span>
+                  <button type="button" onClick={() => openEdit(item)} className="text-cocoa hover:underline">
                     Edit
                   </button>
-                  <button onClick={() => toggleAvailable(item)} className="text-caramel hover:underline">
+                  <button type="button" onClick={() => toggleAvailable(item)} className="text-caramel hover:underline">
                     {item.available ? 'Hide' : 'Show'}
                   </button>
-                  <button onClick={() => setDeleteTarget(item)} className="text-berry hover:underline">
+                  <button type="button" onClick={() => setDeleteTarget(item)} className="text-berry hover:underline">
                     Delete
                   </button>
                 </li>
@@ -169,13 +219,15 @@ function AdminInner() {
           groups={groups}
           onReorderCategories={handleReorderCategories}
           onReorderItems={handleReorderItems}
+          onRenameCategory={openRenameCategory}
+          onDeleteCategory={deleteCategory}
           onEdit={openEdit}
           onToggle={toggleAvailable}
           onDelete={setDeleteTarget}
         />
       )}
 
-      {/* Add / edit modal */}
+      {/* Add / edit item modal */}
       <Modal open={formOpen} onClose={closeForm} title={editingId ? 'Edit item' : 'Add item'}>
         <form onSubmit={handleSubmit} className="space-y-3">
           <label className="block">
@@ -197,24 +249,48 @@ function AdminInner() {
           </label>
           <label className="block">
             <span className="text-sm text-cocoa/70">Category</span>
-            <input
+            <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               required
-              className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
-            />
+              className="mt-1 w-full rounded border border-caramel/40 bg-white px-3 py-2"
+            >
+              {categoryNames.length === 0 && <option value="">Add a category first</option>}
+              {categoryNames.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </label>
-          <label className="block">
-            <span className="text-sm text-cocoa/70">Price</span>
-            <input
-              type="number"
-              step="0.01"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-              required
-              className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
-            />
-          </label>
+          <div className="flex gap-3">
+            <label className="block flex-1">
+              <span className="text-sm text-cocoa/70">Regular price</span>
+              <input
+                type="number"
+                step="0.01"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                required
+                className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
+              />
+            </label>
+            <label className="block flex-1">
+              <span className="text-sm text-cocoa/70">Large price (optional)</span>
+              <input
+                type="number"
+                step="0.01"
+                value={form.largePrice ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    largePrice: e.target.value === '' ? undefined : Number(e.target.value),
+                  })
+                }
+                className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
+              />
+            </label>
+          </div>
           <div className="mt-2 flex justify-end gap-3">
             <button
               type="button"
@@ -225,6 +301,38 @@ function AdminInner() {
             </button>
             <button type="submit" className="rounded bg-cocoa px-4 py-2 font-semibold text-cream">
               {editingId ? 'Save changes' : 'Add item'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Add / rename category modal */}
+      <Modal
+        open={!!catModal}
+        onClose={() => setCatModal(null)}
+        title={catModal?.mode === 'rename' ? 'Rename category' : 'Add category'}
+      >
+        <form onSubmit={submitCategory} className="space-y-3">
+          <label className="block">
+            <span className="text-sm text-cocoa/70">Category name</span>
+            <input
+              value={catName}
+              onChange={(e) => setCatName(e.target.value)}
+              required
+              autoFocus
+              className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
+            />
+          </label>
+          <div className="mt-2 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setCatModal(null)}
+              className="rounded border border-cocoa/30 px-4 py-2 font-semibold text-cocoa"
+            >
+              Cancel
+            </button>
+            <button type="submit" className="rounded bg-cocoa px-4 py-2 font-semibold text-cream">
+              {catModal?.mode === 'rename' ? 'Save' : 'Add category'}
             </button>
           </div>
         </form>

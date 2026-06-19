@@ -16,13 +16,15 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useState, type CSSProperties } from 'react'
 import type { MenuItem } from '../lib/menuTypes'
-import { reorderArray, formatPrice, type MenuGroup } from '../lib/menuUtils'
+import { reorderArray, formatItemPrice, type MenuGroup } from '../lib/menuUtils'
 import { GripIcon, ChevronRightIcon } from './icons'
 
 type DraggableMenuProps = {
   groups: MenuGroup[]
   onReorderCategories: (nextOrder: string[]) => void
   onReorderItems: (category: string, nextItems: MenuItem[]) => void
+  onRenameCategory: (category: string) => void
+  onDeleteCategory: (category: string) => void
   onEdit: (item: MenuItem) => void
   onToggle: (item: MenuItem) => void
   onDelete: (item: MenuItem) => void
@@ -32,6 +34,8 @@ export default function DraggableMenu({
   groups,
   onReorderCategories,
   onReorderItems,
+  onRenameCategory,
+  onDeleteCategory,
   onEdit,
   onToggle,
   onDelete,
@@ -59,6 +63,8 @@ export default function DraggableMenu({
               key={group.category}
               group={group}
               onReorderItems={onReorderItems}
+              onRenameCategory={onRenameCategory}
+              onDeleteCategory={onDeleteCategory}
               onEdit={onEdit}
               onToggle={onToggle}
               onDelete={onDelete}
@@ -73,12 +79,16 @@ export default function DraggableMenu({
 function CategorySection({
   group,
   onReorderItems,
+  onRenameCategory,
+  onDeleteCategory,
   onEdit,
   onToggle,
   onDelete,
 }: {
   group: MenuGroup
   onReorderItems: (category: string, nextItems: MenuItem[]) => void
+  onRenameCategory: (category: string) => void
+  onDeleteCategory: (category: string) => void
   onEdit: (item: MenuItem) => void
   onToggle: (item: MenuItem) => void
   onDelete: (item: MenuItem) => void
@@ -139,6 +149,22 @@ function CategorySection({
             <span className="text-sm font-normal text-cocoa/40">{group.items.length}</span>
           </button>
         </h2>
+        <button
+          type="button"
+          onClick={() => onRenameCategory(group.category)}
+          className="text-sm font-medium text-cocoa/60 hover:text-cocoa hover:underline"
+        >
+          Rename
+        </button>
+        {group.items.length === 0 && (
+          <button
+            type="button"
+            onClick={() => onDeleteCategory(group.category)}
+            className="text-sm font-medium text-berry/80 hover:text-berry hover:underline"
+          >
+            Delete
+          </button>
+        )}
       </div>
 
       {open && (
@@ -198,7 +224,7 @@ function SortableItemRow({
         <GripIcon className="h-5 w-5" />
       </button>
       <span className="flex-1 font-medium text-cocoa">{item.name}</span>
-      <span className="tabular-nums text-cocoa/70">{formatPrice(item.price)}</span>
+      <span className="tabular-nums text-cocoa/70">{formatItemPrice(item)}</span>
       <span
         className={
           'rounded-full px-2 py-0.5 text-xs font-medium ' +

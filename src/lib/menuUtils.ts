@@ -9,6 +9,13 @@ export function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`
 }
 
+/** Price line for an item: "Reg $X · Lg $Y" when a large price is set, else "$X". */
+export function formatItemPrice(item: { price: number; largePrice?: number }): string {
+  return item.largePrice != null
+    ? `Reg ${formatPrice(item.price)} · Lg ${formatPrice(item.largePrice)}`
+    : formatPrice(item.price)
+}
+
 /** Return a new array with the item at `from` moved to index `to`. Pure. */
 export function reorderArray<T>(list: T[], from: number, to: number): T[] {
   const next = [...list]
@@ -62,6 +69,30 @@ export function orderGroups(
   return [...groups].sort(
     (a, b) => rank(a.category) - rank(b.category) || a.category.localeCompare(b.category),
   )
+}
+
+/**
+ * Build the admin's category sections from the saved category list. Includes
+ * empty categories (saved but with no items yet); item categories missing from
+ * the saved list are appended. With no saved categories, falls back to the
+ * canonical order over just the categories that have items.
+ */
+export function buildCategoryGroups(items: MenuItem[], savedCategories: string[]): MenuGroup[] {
+  const withItems = groupByCategory(items)
+  if (savedCategories.length === 0) {
+    return orderGroups(withItems)
+  }
+  const map = new Map(withItems.map((g) => [g.category, g]))
+  const seen = new Set<string>()
+  const result: MenuGroup[] = []
+  for (const category of savedCategories) {
+    result.push(map.get(category) ?? { category, items: [] })
+    seen.add(category)
+  }
+  for (const g of withItems) {
+    if (!seen.has(g.category)) result.push(g)
+  }
+  return result
 }
 
 // Pack whole categories into "boards" of at most maxItems each (a single

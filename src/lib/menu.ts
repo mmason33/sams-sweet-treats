@@ -3,6 +3,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   doc,
   onSnapshot,
   query,
@@ -25,14 +26,22 @@ export function subscribeMenu(onChange: (items: MenuItem[]) => void): () => void
 }
 
 export async function addMenuItem(item: NewMenuItem): Promise<void> {
-  await addDoc(collection(db, COLLECTION), item)
+  // Firestore rejects `undefined`; drop an unset large price rather than store it.
+  const data: Record<string, unknown> = { ...item }
+  if (data.largePrice == null) delete data.largePrice
+  await addDoc(collection(db, COLLECTION), data)
 }
 
 export async function updateMenuItem(
   id: string,
   patch: Partial<NewMenuItem>,
 ): Promise<void> {
-  await updateDoc(doc(db, COLLECTION, id), patch)
+  const data: Record<string, unknown> = { ...patch }
+  // A cleared large price (key present but unset) becomes a field delete.
+  if ('largePrice' in patch && data.largePrice == null) {
+    data.largePrice = deleteField()
+  }
+  await updateDoc(doc(db, COLLECTION, id), data)
 }
 
 export async function deleteMenuItem(id: string): Promise<void> {
@@ -44,6 +53,18 @@ export async function reorderItems(orderedItems: MenuItem[]): Promise<void> {
   const batch = writeBatch(db)
   orderedItems.forEach((item, index) => {
     batch.update(doc(db, COLLECTION, item.id), { sortOrder: index })
+  })
+  await batch.commit()
+}
+
+/** Reassign every given item to a new category name in one batch (rename). */
+export async function renameCategoryItems(
+  items: MenuItem[],
+  newCategory: string,
+): Promise<void> {
+  const batch = writeBatch(db)
+  items.forEach((item) => {
+    batch.update(doc(db, COLLECTION, item.id), { category: newCategory })
   })
   await batch.commit()
 }

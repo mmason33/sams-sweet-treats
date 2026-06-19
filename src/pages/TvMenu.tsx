@@ -10,7 +10,7 @@ import {
   groupByCategory,
   orderGroups,
   paginateGroups,
-  formatPrice,
+  formatItemPrice,
 } from '../lib/menuUtils'
 
 const ROTATE_MS = 7500
@@ -89,7 +89,7 @@ export default function TvMenu() {
                           className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
                         />
                         <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
-                          {formatPrice(item.price)}
+                          {formatItemPrice(item)}
                         </span>
                       </li>
                     ))}

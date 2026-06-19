@@ -14,18 +14,24 @@ const items: MenuItem[] = [
 ]
 vi.mock('../hooks/useMenu', () => ({ useMenu: () => ({ items, loading: false }) }))
 vi.mock('../hooks/useCategoryOrder', () => ({
-  useCategoryOrder: () => ({ categoryOrder: ['Coffee', 'Treats'], loading: false }),
+  useCategoryOrder: () => ({
+    categoryOrder: ['Coffee', 'Treats', 'Specials'],
+    savedCategories: ['Coffee', 'Treats', 'Specials'],
+    loading: false,
+  }),
 }))
 
 const addMenuItem = vi.fn().mockResolvedValue(undefined)
 const updateMenuItem = vi.fn().mockResolvedValue(undefined)
 const deleteMenuItem = vi.fn().mockResolvedValue(undefined)
 const reorderItems = vi.fn().mockResolvedValue(undefined)
+const renameCategoryItems = vi.fn().mockResolvedValue(undefined)
 vi.mock('../lib/menu', () => ({
   addMenuItem: (...a: unknown[]) => addMenuItem(...a),
   updateMenuItem: (...a: unknown[]) => updateMenuItem(...a),
   deleteMenuItem: (...a: unknown[]) => deleteMenuItem(...a),
   reorderItems: (...a: unknown[]) => reorderItems(...a),
+  renameCategoryItems: (...a: unknown[]) => renameCategoryItems(...a),
 }))
 
 const saveCategoryOrder = vi.fn().mockResolvedValue(undefined)
@@ -58,13 +64,68 @@ describe('Admin', () => {
     await user.click(screen.getByRole('button', { name: /add item/i }))
     const dialog = screen.getByRole('dialog')
     await user.type(within(dialog).getByLabelText(/name/i), 'Mocha')
-    await user.type(within(dialog).getByLabelText(/category/i), 'Coffee')
-    await user.type(within(dialog).getByLabelText(/price/i), '5')
+    await user.selectOptions(within(dialog).getByLabelText(/category/i), 'Coffee')
+    await user.type(within(dialog).getByLabelText(/regular price/i), '5')
     await user.click(within(dialog).getByRole('button', { name: /add item/i }))
     // Coffee already has sortOrder 0 and 1, so the new item appends at 2.
     expect(addMenuItem).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Mocha', category: 'Coffee', price: 5, available: true, sortOrder: 2 }),
     )
+  })
+
+  it('shows the category field as a dropdown of saved categories', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    await user.click(screen.getByRole('button', { name: /add item/i }))
+    const select = within(screen.getByRole('dialog')).getByLabelText(/category/i)
+    expect(select.tagName).toBe('SELECT')
+    expect(within(select).getByRole('option', { name: 'Coffee' })).toBeInTheDocument()
+    expect(within(select).getByRole('option', { name: 'Specials' })).toBeInTheDocument()
+  })
+
+  it('passes a large price when one is entered', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    await user.click(screen.getByRole('button', { name: /add item/i }))
+    const dialog = screen.getByRole('dialog')
+    await user.type(within(dialog).getByLabelText(/name/i), 'Mocha')
+    await user.selectOptions(within(dialog).getByLabelText(/category/i), 'Coffee')
+    await user.type(within(dialog).getByLabelText(/regular price/i), '4.5')
+    await user.type(within(dialog).getByLabelText(/large price/i), '5.5')
+    await user.click(within(dialog).getByRole('button', { name: /add item/i }))
+    expect(addMenuItem).toHaveBeenCalledWith(expect.objectContaining({ largePrice: 5.5 }))
+  })
+
+  it('adds a category, appending it to the saved order', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    await user.click(screen.getByRole('button', { name: /add category/i }))
+    const dialog = screen.getByRole('dialog')
+    await user.type(within(dialog).getByLabelText(/category name/i), 'Smoothies')
+    await user.click(within(dialog).getByRole('button', { name: /add category/i }))
+    expect(saveCategoryOrder).toHaveBeenCalledWith(['Coffee', 'Treats', 'Specials', 'Smoothies'])
+  })
+
+  it('renames a category and reassigns its items', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    const coffeeHeader = screen.getByText('Coffee').closest('div') as HTMLElement
+    await user.click(within(coffeeHeader).getByRole('button', { name: /rename/i }))
+    const dialog = screen.getByRole('dialog')
+    const input = within(dialog).getByLabelText(/category name/i)
+    await user.clear(input)
+    await user.type(input, 'Espresso')
+    await user.click(within(dialog).getByRole('button', { name: /save/i }))
+    expect(renameCategoryItems).toHaveBeenCalled()
+    expect(saveCategoryOrder).toHaveBeenCalledWith(['Espresso', 'Treats', 'Specials'])
+  })
+
+  it('deletes an empty category', async () => {
+    const user = userEvent.setup()
+    render(<Admin />)
+    const specialsHeader = screen.getByText('Specials').closest('div') as HTMLElement
+    await user.click(within(specialsHeader).getByRole('button', { name: /delete/i }))
+    expect(saveCategoryOrder).toHaveBeenCalledWith(['Coffee', 'Treats'])
   })
 
   it('does not show a sort order field in the modal', async () => {
@@ -88,7 +149,7 @@ describe('Admin', () => {
     await user.click(within(rowFor('Latte')).getByRole('button', { name: /edit/i }))
     const dialog = screen.getByRole('dialog')
     expect(within(dialog).getByLabelText(/name/i)).toHaveValue('Latte')
-    const price = within(dialog).getByLabelText(/price/i)
+    const price = within(dialog).getByLabelText(/regular price/i)
     await user.clear(price)
     await user.type(price, '6')
     await user.click(within(dialog).getByRole('button', { name: /save changes/i }))

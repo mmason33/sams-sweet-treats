@@ -19,6 +19,8 @@ function renderMenu(overrides: Partial<React.ComponentProps<typeof DraggableMenu
     groups,
     onReorderCategories: vi.fn(),
     onReorderItems: vi.fn(),
+    onRenameCategory: vi.fn(),
+    onDeleteCategory: vi.fn(),
     onEdit: vi.fn(),
     onToggle: vi.fn(),
     onDelete: vi.fn(),
@@ -55,6 +57,24 @@ describe('DraggableMenu', () => {
     expect(screen.getByText('Brownie')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /expand coffee/i }))
     expect(screen.getByText('Latte')).toBeInTheDocument()
+  })
+
+  it('fires category rename and only shows delete for empty categories', async () => {
+    const user = userEvent.setup()
+    const props = renderMenu({
+      groups: [
+        { category: 'Coffee', items: [latte] },
+        { category: 'Empty', items: [] },
+      ],
+    })
+    const coffeeHeader = screen.getByText('Coffee').closest('div') as HTMLElement
+    await user.click(within(coffeeHeader).getByRole('button', { name: /rename/i }))
+    expect(props.onRenameCategory).toHaveBeenCalledWith('Coffee')
+    // Non-empty category has no delete; empty one does.
+    expect(within(coffeeHeader).queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument()
+    const emptyHeader = screen.getByText('Empty').closest('div') as HTMLElement
+    await user.click(within(emptyHeader).getByRole('button', { name: /delete/i }))
+    expect(props.onDeleteCategory).toHaveBeenCalledWith('Empty')
   })
 
   it('fires row callbacks', async () => {
