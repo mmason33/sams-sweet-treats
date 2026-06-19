@@ -3,6 +3,7 @@ import type { MenuItem } from './menuTypes'
 import {
   formatPrice,
   formatItemPrice,
+  hasPrice,
   sortItems,
   groupByCategory,
   availableItems,
@@ -122,6 +123,18 @@ describe('formatItemPrice', () => {
   })
   it('shows both sizes when a large price is set', () => {
     expect(formatItemPrice({ price: 4.5, largePrice: 5.5 })).toBe('Reg $4.50 · Lg $5.50')
+  })
+})
+
+describe('hasPrice', () => {
+  it('is false for a $0 item with no large price', () => {
+    expect(hasPrice({ price: 0 })).toBe(false)
+  })
+  it('is true when there is a regular price', () => {
+    expect(hasPrice({ price: 3.5 })).toBe(true)
+  })
+  it('is true when only a large price is set', () => {
+    expect(hasPrice({ price: 0, largePrice: 6 })).toBe(true)
   })
 })
 

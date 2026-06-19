@@ -16,6 +16,14 @@ export function formatItemPrice(item: { price: number; largePrice?: number }): s
     : formatPrice(item.price)
 }
 
+/**
+ * Whether an item has a price worth showing. A $0 item (with no large price) is
+ * treated as priceless — used to render modifiers (syrups, milk types) as labels.
+ */
+export function hasPrice(item: { price: number; largePrice?: number }): boolean {
+  return item.price > 0 || (item.largePrice ?? 0) > 0
+}
+
 /** Return a new array with the item at `from` moved to index `to`. Pure. */
 export function reorderArray<T>(list: T[], from: number, to: number): T[] {
   const next = [...list]

@@ -11,6 +11,7 @@ import {
   orderGroups,
   paginateGroups,
   formatItemPrice,
+  hasPrice,
 } from '../lib/menuUtils'
 
 const ROTATE_MS = 7500
@@ -83,14 +84,20 @@ export default function TvMenu() {
                     {group.items.map((item) => (
                       <li key={item.id} className="flex items-end gap-2 text-3xl">
                         <span className="leading-tight">{item.name}</span>
-                        {/* dotted leader fills the gap between name and price */}
-                        <span
-                          aria-hidden="true"
-                          className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
-                        />
-                        <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
-                          {formatItemPrice(item)}
-                        </span>
+                        {/* $0 items (e.g. syrup/milk modifiers) show as a label
+                            with no leader or price. */}
+                        {hasPrice(item) && (
+                          <>
+                            {/* dotted leader fills the gap between name and price */}
+                            <span
+                              aria-hidden="true"
+                              className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
+                            />
+                            <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
+                              {formatItemPrice(item)}
+                            </span>
+                          </>
+                        )}
                       </li>
                     ))}
                   </ul>
