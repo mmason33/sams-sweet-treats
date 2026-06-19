@@ -1,10 +1,18 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Modal from '../components/Modal'
+import DraggableMenu from '../components/DraggableMenu'
 import { useMenu } from '../hooks/useMenu'
-import { addMenuItem, updateMenuItem, deleteMenuItem } from '../lib/menu'
+import { useCategoryOrder } from '../hooks/useCategoryOrder'
+import {
+  addMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+  reorderItems,
+} from '../lib/menu'
+import { saveCategoryOrder } from '../lib/config'
 import { signOutUser } from '../lib/auth'
-import { formatPrice } from '../lib/menuUtils'
+import { formatPrice, groupByCategory, orderGroups } from '../lib/menuUtils'
 import type { MenuItem, NewMenuItem } from '../lib/menuTypes'
 
 const empty: NewMenuItem = {
@@ -16,33 +24,31 @@ const empty: NewMenuItem = {
   sortOrder: 0,
 }
 
-type SortKey = 'name' | 'category'
-type SortDir = 'asc' | 'desc'
-
 function AdminInner() {
   const { items } = useMenu()
+  const { categoryOrder } = useCategoryOrder()
   const [form, setForm] = useState<NewMenuItem>(empty)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<MenuItem | null>(null)
   const [search, setSearch] = useState('')
-  const [sortKey, setSortKey] = useState<SortKey>('category')
-  const [sortDir, setSortDir] = useState<SortDir>('asc')
 
-  const rows = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    const filtered = q
-      ? items.filter(
-          (i) => i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q),
-        )
-      : items
-    const dir = sortDir === 'asc' ? 1 : -1
-    return [...filtered].sort((a, b) => {
-      const primary = a[sortKey].localeCompare(b[sortKey]) * dir
-      // Stable secondary sort so equal keys stay grouped sensibly.
-      return primary || a.name.localeCompare(b.name)
-    })
-  }, [items, search, sortKey, sortDir])
+  const groups = useMemo(
+    () => orderGroups(groupByCategory(items), categoryOrder),
+    [items, categoryOrder],
+  )
+
+  const query = search.trim().toLowerCase()
+  const filtered = useMemo(
+    () =>
+      query
+        ? items.filter(
+            (i) =>
+              i.name.toLowerCase().includes(query) || i.category.toLowerCase().includes(query),
+          )
+        : [],
+    [items, query],
+  )
 
   function openAdd() {
     setForm(empty)
@@ -74,7 +80,12 @@ function AdminInner() {
     if (editingId) {
       await updateMenuItem(editingId, form)
     } else {
-      await addMenuItem(form)
+      // Append the new item to the end of its category.
+      const inCategory = items.filter((i) => i.category === form.category)
+      const sortOrder = inCategory.length
+        ? Math.max(...inCategory.map((i) => i.sortOrder)) + 1
+        : 0
+      await addMenuItem({ ...form, sortOrder })
     }
     closeForm()
   }
@@ -85,16 +96,17 @@ function AdminInner() {
     setDeleteTarget(null)
   }
 
-  function toggleSort(key: SortKey) {
-    if (key === sortKey) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortKey(key)
-      setSortDir('asc')
-    }
+  function handleReorderItems(_category: string, nextItems: MenuItem[]) {
+    void reorderItems(nextItems)
   }
 
-  const sortArrow = (key: SortKey) => (sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '')
+  function handleReorderCategories(nextOrder: string[]) {
+    void saveCategoryOrder(nextOrder)
+  }
+
+  function toggleAvailable(item: MenuItem) {
+    void updateMenuItem(item.id, { available: !item.available })
+  }
 
   return (
     <main className="mx-auto max-w-4xl p-6">
@@ -123,76 +135,45 @@ function AdminInner() {
         </button>
       </div>
 
-      {/* Items table */}
-      <div className="overflow-x-auto rounded-xl border border-caramel/20 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-caramel/30 text-xs uppercase tracking-wide text-cocoa/60">
-              <th className="px-4 py-3">
-                <button onClick={() => toggleSort('name')} className="font-semibold hover:text-cocoa">
-                  Name <span className="text-berry">{sortArrow('name')}</span>
-                </button>
-              </th>
-              <th className="px-4 py-3">
-                <button onClick={() => toggleSort('category')} className="font-semibold hover:text-cocoa">
-                  Category <span className="text-berry">{sortArrow('category')}</span>
-                </button>
-              </th>
-              <th className="px-4 py-3 text-right">Price</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-cocoa/50">
-                  No items match “{search}”.
-                </td>
-              </tr>
-            ) : (
-              rows.map((item) => (
-                <tr key={item.id} className="border-b border-caramel/15 last:border-0 hover:bg-blush-soft/40">
-                  <td className="px-4 py-3 font-medium text-cocoa">{item.name}</td>
-                  <td className="px-4 py-3 text-cocoa/70">{item.category}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-cocoa">{formatPrice(item.price)}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={
-                        'inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ' +
-                        (item.available
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-cocoa/10 text-cocoa/60')
-                      }
-                    >
-                      {item.available ? 'Available' : 'Hidden'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-3 whitespace-nowrap">
-                      <button onClick={() => openEdit(item)} className="text-cocoa hover:underline">
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => updateMenuItem(item.id, { available: !item.available })}
-                        className="text-caramel hover:underline"
-                      >
-                        {item.available ? 'Hide' : 'Show'}
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(item)}
-                        className="text-berry hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {query ? (
+        // Find-only mode: flat filtered results, no drag.
+        <div className="rounded-xl border border-caramel/20 bg-white p-4 shadow-sm">
+          {filtered.length === 0 ? (
+            <p className="py-6 text-center text-cocoa/50">No items match "{search}".</p>
+          ) : (
+            <ul className="space-y-1">
+              {filtered.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-blush-soft/40"
+                >
+                  <span className="flex-1 font-medium text-cocoa">{item.name}</span>
+                  <span className="text-cocoa/60">{item.category}</span>
+                  <span className="tabular-nums text-cocoa/70">{formatPrice(item.price)}</span>
+                  <button onClick={() => openEdit(item)} className="text-cocoa hover:underline">
+                    Edit
+                  </button>
+                  <button onClick={() => toggleAvailable(item)} className="text-caramel hover:underline">
+                    {item.available ? 'Hide' : 'Show'}
+                  </button>
+                  <button onClick={() => setDeleteTarget(item)} className="text-berry hover:underline">
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : (
+        <DraggableMenu
+          groups={groups}
+          onReorderCategories={handleReorderCategories}
+          onReorderItems={handleReorderItems}
+          onEdit={openEdit}
+          onToggle={toggleAvailable}
+          onDelete={setDeleteTarget}
+        />
+      )}
 
       {/* Add / edit modal */}
       <Modal open={formOpen} onClose={closeForm} title={editingId ? 'Edit item' : 'Add item'}>
@@ -223,28 +204,17 @@ function AdminInner() {
               className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
             />
           </label>
-          <div className="flex gap-3">
-            <label className="block flex-1">
-              <span className="text-sm text-cocoa/70">Price</span>
-              <input
-                type="number"
-                step="0.01"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                required
-                className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
-              />
-            </label>
-            <label className="block flex-1">
-              <span className="text-sm text-cocoa/70">Sort order</span>
-              <input
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-                className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
-              />
-            </label>
-          </div>
+          <label className="block">
+            <span className="text-sm text-cocoa/70">Price</span>
+            <input
+              type="number"
+              step="0.01"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+              required
+              className="mt-1 w-full rounded border border-caramel/40 px-3 py-2"
+            />
+          </label>
           <div className="mt-2 flex justify-end gap-3">
             <button
               type="button"
@@ -263,7 +233,7 @@ function AdminInner() {
       {/* Delete confirmation modal */}
       <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Delete item?">
         <p className="text-cocoa/80">
-          Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This can’t be undone.
+          Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This can't be undone.
         </p>
         <div className="mt-6 flex justify-end gap-3">
           <button
