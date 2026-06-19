@@ -256,7 +256,7 @@ function SortableItemRow({
         title={item.available ? 'Hide' : 'Show'}
         className="rounded p-1.5 text-caramel hover:bg-caramel/10"
       >
-        {item.available ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+        {item.available ? <EyeIcon className="h-5 w-5" /> : <EyeOffIcon className="h-5 w-5" />}
       </button>
       <button
         type="button"
