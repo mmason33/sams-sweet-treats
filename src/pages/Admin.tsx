@@ -14,6 +14,7 @@ import {
 import { saveCategoryOrder } from '../lib/config'
 import { signOutUser } from '../lib/auth'
 import { buildCategoryGroups, formatItemPrice } from '../lib/menuUtils'
+import { PencilIcon, EyeIcon, EyeOffIcon, TrashIcon } from '../components/icons'
 import type { MenuItem, NewMenuItem } from '../lib/menuTypes'
 
 const empty: NewMenuItem = {
@@ -200,14 +201,32 @@ function AdminInner() {
                   <span className="flex-1 font-medium text-cocoa">{item.name}</span>
                   <span className="text-cocoa/60">{item.category}</span>
                   <span className="tabular-nums text-cocoa/70">{formatItemPrice(item)}</span>
-                  <button type="button" onClick={() => openEdit(item)} className="text-cocoa hover:underline">
-                    Edit
+                  <button
+                    type="button"
+                    onClick={() => openEdit(item)}
+                    aria-label={`Edit ${item.name}`}
+                    title="Edit"
+                    className="rounded p-1.5 text-cocoa hover:bg-cocoa/10"
+                  >
+                    <PencilIcon className="h-5 w-5" />
                   </button>
-                  <button type="button" onClick={() => toggleAvailable(item)} className="text-caramel hover:underline">
-                    {item.available ? 'Hide' : 'Show'}
+                  <button
+                    type="button"
+                    onClick={() => toggleAvailable(item)}
+                    aria-label={`${item.available ? 'Hide' : 'Show'} ${item.name}`}
+                    title={item.available ? 'Hide' : 'Show'}
+                    className="rounded p-1.5 text-caramel hover:bg-caramel/10"
+                  >
+                    {item.available ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                   </button>
-                  <button type="button" onClick={() => setDeleteTarget(item)} className="text-berry hover:underline">
-                    Delete
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(item)}
+                    aria-label={`Delete ${item.name}`}
+                    title="Delete"
+                    className="rounded p-1.5 text-berry hover:bg-berry/10"
+                  >
+                    <TrashIcon className="h-5 w-5" />
                   </button>
                 </li>
               ))}

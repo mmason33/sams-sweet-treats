@@ -17,7 +17,14 @@ import { CSS } from '@dnd-kit/utilities'
 import { useState, type CSSProperties } from 'react'
 import type { MenuItem } from '../lib/menuTypes'
 import { reorderArray, formatItemPrice, type MenuGroup } from '../lib/menuUtils'
-import { GripIcon, ChevronRightIcon } from './icons'
+import {
+  GripIcon,
+  ChevronRightIcon,
+  PencilIcon,
+  EyeIcon,
+  EyeOffIcon,
+  TrashIcon,
+} from './icons'
 
 type DraggableMenuProps = {
   groups: MenuGroup[]
@@ -233,14 +240,32 @@ function SortableItemRow({
       >
         {item.available ? 'Available' : 'Hidden'}
       </span>
-      <button type="button" onClick={() => onEdit(item)} className="text-cocoa hover:underline">
-        Edit
+      <button
+        type="button"
+        onClick={() => onEdit(item)}
+        aria-label={`Edit ${item.name}`}
+        title="Edit"
+        className="rounded p-1.5 text-cocoa hover:bg-cocoa/10"
+      >
+        <PencilIcon className="h-5 w-5" />
       </button>
-      <button type="button" onClick={() => onToggle(item)} className="text-caramel hover:underline">
-        {item.available ? 'Hide' : 'Show'}
+      <button
+        type="button"
+        onClick={() => onToggle(item)}
+        aria-label={`${item.available ? 'Hide' : 'Show'} ${item.name}`}
+        title={item.available ? 'Hide' : 'Show'}
+        className="rounded p-1.5 text-caramel hover:bg-caramel/10"
+      >
+        {item.available ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
       </button>
-      <button type="button" onClick={() => onDelete(item)} className="text-berry hover:underline">
-        Delete
+      <button
+        type="button"
+        onClick={() => onDelete(item)}
+        aria-label={`Delete ${item.name}`}
+        title="Delete"
+        className="rounded p-1.5 text-berry hover:bg-berry/10"
+      >
+        <TrashIcon className="h-5 w-5" />
       </button>
     </li>
   )
