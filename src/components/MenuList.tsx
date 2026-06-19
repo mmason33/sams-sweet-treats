@@ -6,8 +6,14 @@ import { ChevronLeftIcon, ChevronRightIcon } from './icons'
 
 const ALL = '__all__'
 
-export default function MenuList({ items }: { items: MenuItem[] }) {
-  const groups = orderGroups(groupByCategory(availableItems(items)))
+export default function MenuList({
+  items,
+  categoryOrder,
+}: {
+  items: MenuItem[]
+  categoryOrder?: string[]
+}) {
+  const groups = orderGroups(groupByCategory(availableItems(items)), categoryOrder)
   const [active, setActive] = useState<string>('')
 
   // Horizontal scroll control for the pill strip (arrows on desktop).

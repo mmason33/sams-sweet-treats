@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMenu } from '../hooks/useMenu'
+import { useCategoryOrder } from '../hooks/useCategoryOrder'
 import { useFullscreen } from '../hooks/useFullscreen'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useIdleCursor } from '../hooks/useIdleCursor'
@@ -17,7 +18,8 @@ const ITEMS_PER_BOARD = 16 // ~7 per column across two columns
 
 export default function TvMenu() {
   const { items, loading } = useMenu()
-  const groups = orderGroups(groupByCategory(availableItems(items)))
+  const { categoryOrder } = useCategoryOrder()
+  const groups = orderGroups(groupByCategory(availableItems(items)), categoryOrder)
   const boards = paginateGroups(groups, ITEMS_PER_BOARD)
   const [page, setPage] = useState(0)
 

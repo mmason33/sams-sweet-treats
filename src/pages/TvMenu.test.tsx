@@ -9,6 +9,9 @@ const items: MenuItem[] = [
 vi.mock('../hooks/useMenu', () => ({
   useMenu: () => ({ items, loading: false }),
 }))
+vi.mock('../hooks/useCategoryOrder', () => ({
+  useCategoryOrder: () => ({ categoryOrder: [], loading: false }),
+}))
 
 import TvMenu from './TvMenu'
 

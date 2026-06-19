@@ -1,4 +1,5 @@
 import { useMenu } from '../hooks/useMenu'
+import { useCategoryOrder } from '../hooks/useCategoryOrder'
 import MenuList from '../components/MenuList'
 import Gallery from '../components/Gallery'
 import Nav from '../components/Nav'
@@ -28,6 +29,7 @@ const galleryPhotos = [
 
 export default function Home() {
   const { items, loading } = useMenu()
+  const { categoryOrder } = useCategoryOrder()
 
   return (
     <div className="min-h-full">
@@ -109,7 +111,7 @@ export default function Home() {
         {loading ? (
           <p className="text-center italic text-cocoa/60">Loading menu…</p>
         ) : (
-          <MenuList items={items} />
+          <MenuList items={items} categoryOrder={categoryOrder} />
         )}
       </section>
 
