@@ -9,6 +9,14 @@ export function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`
 }
 
+/** Return a new array with the item at `from` moved to index `to`. Pure. */
+export function reorderArray<T>(list: T[], from: number, to: number): T[] {
+  const next = [...list]
+  const [moved] = next.splice(from, 1)
+  next.splice(to, 0, moved)
+  return next
+}
+
 export function sortItems(items: MenuItem[]): MenuItem[] {
   return [...items].sort(
     (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name),
@@ -43,10 +51,13 @@ export const CATEGORY_ORDER = [
   'Pastries', 'Muffins & Scones', 'Cookies & Bars', 'Cakes & Sweets', 'Breakfast',
 ]
 
-export function orderGroups(groups: MenuGroup[]): MenuGroup[] {
+export function orderGroups(
+  groups: MenuGroup[],
+  categoryOrder: string[] = CATEGORY_ORDER,
+): MenuGroup[] {
   const rank = (c: string) => {
-    const i = CATEGORY_ORDER.indexOf(c)
-    return i === -1 ? CATEGORY_ORDER.length : i
+    const i = categoryOrder.indexOf(c)
+    return i === -1 ? categoryOrder.length : i
   }
   return [...groups].sort(
     (a, b) => rank(a.category) - rank(b.category) || a.category.localeCompare(b.category),

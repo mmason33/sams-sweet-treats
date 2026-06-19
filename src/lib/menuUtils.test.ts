@@ -7,6 +7,7 @@ import {
   availableItems,
   orderGroups,
   paginateGroups,
+  reorderArray,
 } from './menuUtils'
 
 const item = (over: Partial<MenuItem>): MenuItem => ({
@@ -83,5 +84,32 @@ describe('paginateGroups', () => {
     const pages = paginateGroups([big], 7)
     expect(pages).toHaveLength(1)
     expect(pages[0][0].items).toHaveLength(20)
+  })
+})
+
+describe('reorderArray', () => {
+  it('moves an element forward', () => {
+    expect(reorderArray(['a', 'b', 'c', 'd'], 0, 2)).toEqual(['b', 'c', 'a', 'd'])
+  })
+  it('moves an element backward', () => {
+    expect(reorderArray(['a', 'b', 'c', 'd'], 3, 1)).toEqual(['a', 'd', 'b', 'c'])
+  })
+  it('does not mutate the input', () => {
+    const input = ['a', 'b', 'c']
+    reorderArray(input, 0, 2)
+    expect(input).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('orderGroups with a custom category order', () => {
+  it('respects the provided order over the canonical default', () => {
+    const g = (category: string) => ({ category, items: [] })
+    const ordered = orderGroups([g('Coffee'), g('Treats')], ['Treats', 'Coffee'])
+    expect(ordered.map((x) => x.category)).toEqual(['Treats', 'Coffee'])
+  })
+  it('sorts categories missing from the order list last, alphabetically', () => {
+    const g = (category: string) => ({ category, items: [] })
+    const ordered = orderGroups([g('Zebra'), g('Apple'), g('Treats')], ['Treats'])
+    expect(ordered.map((x) => x.category)).toEqual(['Treats', 'Apple', 'Zebra'])
   })
 })
