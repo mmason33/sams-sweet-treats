@@ -14,10 +14,10 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import type { MenuItem } from '../lib/menuTypes'
 import { reorderArray, formatPrice, type MenuGroup } from '../lib/menuUtils'
-import { GripIcon } from './icons'
+import { GripIcon, ChevronRightIcon } from './icons'
 
 type DraggableMenuProps = {
   groups: MenuGroup[]
@@ -87,6 +87,7 @@ function CategorySection({
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
+  const [open, setOpen] = useState(true)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.category,
   })
@@ -111,8 +112,9 @@ function CategorySection({
       style={style}
       className="rounded-xl border border-caramel/20 bg-white p-4 shadow-sm"
     >
-      <div className="mb-3 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <button
+          type="button"
           {...attributes}
           {...listeners}
           aria-label={`Reorder ${group.category} category`}
@@ -120,24 +122,42 @@ function CategorySection({
         >
           <GripIcon className="h-5 w-5" />
         </button>
-        <h2 className="text-xl font-bold text-cocoa">{group.category}</h2>
+        <h2 className="flex-1 text-xl font-bold text-cocoa">
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={`${open ? 'Collapse' : 'Expand'} ${group.category}`}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            <ChevronRightIcon
+              className={
+                'h-4 w-4 shrink-0 text-cocoa/50 transition-transform ' + (open ? 'rotate-90' : '')
+              }
+            />
+            <span>{group.category}</span>
+            <span className="text-sm font-normal text-cocoa/40">{group.items.length}</span>
+          </button>
+        </h2>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
-        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-          <ul className="space-y-1">
-            {group.items.map((item) => (
-              <SortableItemRow
-                key={item.id}
-                item={item}
-                onEdit={onEdit}
-                onToggle={onToggle}
-                onDelete={onDelete}
-              />
-            ))}
-          </ul>
-        </SortableContext>
-      </DndContext>
+      {open && (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
+          <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+            <ul className="mt-3 space-y-1">
+              {group.items.map((item) => (
+                <SortableItemRow
+                  key={item.id}
+                  item={item}
+                  onEdit={onEdit}
+                  onToggle={onToggle}
+                  onDelete={onDelete}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      )}
     </section>
   )
 }
@@ -169,6 +189,7 @@ function SortableItemRow({
       className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-blush-soft/40"
     >
       <button
+        type="button"
         {...attributes}
         {...listeners}
         aria-label={`Reorder ${item.name}`}
@@ -186,13 +207,13 @@ function SortableItemRow({
       >
         {item.available ? 'Available' : 'Hidden'}
       </span>
-      <button onClick={() => onEdit(item)} className="text-cocoa hover:underline">
+      <button type="button" onClick={() => onEdit(item)} className="text-cocoa hover:underline">
         Edit
       </button>
-      <button onClick={() => onToggle(item)} className="text-caramel hover:underline">
+      <button type="button" onClick={() => onToggle(item)} className="text-caramel hover:underline">
         {item.available ? 'Hide' : 'Show'}
       </button>
-      <button onClick={() => onDelete(item)} className="text-berry hover:underline">
+      <button type="button" onClick={() => onDelete(item)} className="text-berry hover:underline">
         Delete
       </button>
     </li>

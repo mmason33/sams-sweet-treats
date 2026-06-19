@@ -44,6 +44,19 @@ describe('DraggableMenu', () => {
     expect(screen.getByLabelText(/reorder latte/i)).toBeInTheDocument()
   })
 
+  it('collapses and expands a category independently', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+    expect(screen.getByText('Latte')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /collapse coffee/i }))
+    expect(screen.queryByText('Latte')).not.toBeInTheDocument()
+    expect(screen.queryByText('Americano')).not.toBeInTheDocument()
+    // Other categories stay open.
+    expect(screen.getByText('Brownie')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /expand coffee/i }))
+    expect(screen.getByText('Latte')).toBeInTheDocument()
+  })
+
   it('fires row callbacks', async () => {
     const user = userEvent.setup()
     const props = renderMenu()
