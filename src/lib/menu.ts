@@ -6,6 +6,7 @@ import {
   doc,
   onSnapshot,
   query,
+  writeBatch,
 } from 'firebase/firestore'
 import { db } from './firebase'
 import type { MenuItem, NewMenuItem } from './menuTypes'
@@ -36,4 +37,13 @@ export async function updateMenuItem(
 
 export async function deleteMenuItem(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTION, id))
+}
+
+/** Persist a new within-category order by writing each item's index as sortOrder. */
+export async function reorderItems(orderedItems: MenuItem[]): Promise<void> {
+  const batch = writeBatch(db)
+  orderedItems.forEach((item, index) => {
+    batch.update(doc(db, COLLECTION, item.id), { sortOrder: index })
+  })
+  await batch.commit()
 }
