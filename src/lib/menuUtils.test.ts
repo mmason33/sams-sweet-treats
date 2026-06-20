@@ -2,11 +2,15 @@ import { describe, it, expect } from 'vitest'
 import type { MenuItem } from './menuTypes'
 import {
   formatPrice,
+  formatItemPrice,
+  hasPrice,
   sortItems,
   groupByCategory,
   availableItems,
   orderGroups,
   paginateGroups,
+  reorderArray,
+  buildCategoryGroups,
 } from './menuUtils'
 
 const item = (over: Partial<MenuItem>): MenuItem => ({
@@ -83,5 +87,74 @@ describe('paginateGroups', () => {
     const pages = paginateGroups([big], 7)
     expect(pages).toHaveLength(1)
     expect(pages[0][0].items).toHaveLength(20)
+  })
+})
+
+describe('reorderArray', () => {
+  it('moves an element forward', () => {
+    expect(reorderArray(['a', 'b', 'c', 'd'], 0, 2)).toEqual(['b', 'c', 'a', 'd'])
+  })
+  it('moves an element backward', () => {
+    expect(reorderArray(['a', 'b', 'c', 'd'], 3, 1)).toEqual(['a', 'd', 'b', 'c'])
+  })
+  it('does not mutate the input', () => {
+    const input = ['a', 'b', 'c']
+    reorderArray(input, 0, 2)
+    expect(input).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('orderGroups with a custom category order', () => {
+  it('respects the provided order over the canonical default', () => {
+    const g = (category: string) => ({ category, items: [] })
+    const ordered = orderGroups([g('Coffee'), g('Treats')], ['Treats', 'Coffee'])
+    expect(ordered.map((x) => x.category)).toEqual(['Treats', 'Coffee'])
+  })
+  it('sorts categories missing from the order list last, alphabetically', () => {
+    const g = (category: string) => ({ category, items: [] })
+    const ordered = orderGroups([g('Zebra'), g('Apple'), g('Treats')], ['Treats'])
+    expect(ordered.map((x) => x.category)).toEqual(['Treats', 'Apple', 'Zebra'])
+  })
+})
+
+describe('formatItemPrice', () => {
+  it('shows a single price when there is no large price', () => {
+    expect(formatItemPrice({ price: 4 })).toBe('$4.00')
+  })
+  it('shows both sizes when a large price is set', () => {
+    expect(formatItemPrice({ price: 4.5, largePrice: 5.5 })).toBe('Reg $4.50 · Lg $5.50')
+  })
+})
+
+describe('hasPrice', () => {
+  it('is false for a $0 item with no large price', () => {
+    expect(hasPrice({ price: 0 })).toBe(false)
+  })
+  it('is true when there is a regular price', () => {
+    expect(hasPrice({ price: 3.5 })).toBe(true)
+  })
+  it('is true when only a large price is set', () => {
+    expect(hasPrice({ price: 0, largePrice: 6 })).toBe(true)
+  })
+})
+
+describe('buildCategoryGroups', () => {
+  it('includes saved empty categories and orders by the saved list', () => {
+    const coffee = item({ id: 'c', category: 'Coffee' })
+    const groups = buildCategoryGroups([coffee], ['Treats', 'Coffee'])
+    expect(groups.map((g) => g.category)).toEqual(['Treats', 'Coffee'])
+    expect(groups[0].items).toEqual([]) // Treats is saved but has no items
+    expect(groups[1].items.map((i) => i.id)).toEqual(['c'])
+  })
+  it('appends item categories missing from the saved list', () => {
+    const treat = item({ id: 't', category: 'Treats' })
+    const groups = buildCategoryGroups([treat], ['Coffee'])
+    expect(groups.map((g) => g.category)).toEqual(['Coffee', 'Treats'])
+  })
+  it('falls back to canonical order over categories with items when nothing is saved', () => {
+    const pastry = item({ id: 'p', category: 'Pastries' })
+    const coffee = item({ id: 'c', category: 'Hot Coffee' })
+    const groups = buildCategoryGroups([pastry, coffee], [])
+    expect(groups.map((g) => g.category)).toEqual(['Hot Coffee', 'Pastries'])
   })
 })

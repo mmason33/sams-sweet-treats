@@ -5,9 +5,13 @@ import type { MenuItem } from '../lib/menuTypes'
 const items: MenuItem[] = [
   { id: '1', name: 'Latte', description: '', price: 4.5, category: 'Coffee', available: true, sortOrder: 0 },
   { id: '2', name: 'Old Brew', description: '', price: 2, category: 'Coffee', available: false, sortOrder: 1 },
+  { id: '3', name: 'Vanilla Syrup', description: '', price: 0, category: 'Coffee', available: true, sortOrder: 2 },
 ]
 vi.mock('../hooks/useMenu', () => ({
   useMenu: () => ({ items, loading: false }),
+}))
+vi.mock('../hooks/useCategoryOrder', () => ({
+  useCategoryOrder: () => ({ categoryOrder: [], loading: false }),
 }))
 
 import TvMenu from './TvMenu'
@@ -22,6 +26,12 @@ describe('TvMenu', () => {
     expect(screen.getByText('Latte')).toBeInTheDocument()
     expect(screen.getByText('$4.50')).toBeInTheDocument()
     expect(screen.queryByText('Old Brew')).not.toBeInTheDocument()
+  })
+
+  it('shows a $0 modifier as a label with no price', () => {
+    render(<TvMenu />)
+    expect(screen.getByText('Vanilla Syrup')).toBeInTheDocument()
+    expect(screen.queryByText('$0.00')).not.toBeInTheDocument()
   })
 
   it('hides the fullscreen toggle where the API is unsupported', () => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMenu } from '../hooks/useMenu'
+import { useCategoryOrder } from '../hooks/useCategoryOrder'
 import { useFullscreen } from '../hooks/useFullscreen'
 import { useWakeLock } from '../hooks/useWakeLock'
 import { useIdleCursor } from '../hooks/useIdleCursor'
@@ -9,7 +10,8 @@ import {
   groupByCategory,
   orderGroups,
   paginateGroups,
-  formatPrice,
+  formatItemPrice,
+  hasPrice,
 } from '../lib/menuUtils'
 
 const ROTATE_MS = 7500
@@ -17,7 +19,8 @@ const ITEMS_PER_BOARD = 16 // ~7 per column across two columns
 
 export default function TvMenu() {
   const { items, loading } = useMenu()
-  const groups = orderGroups(groupByCategory(availableItems(items)))
+  const { categoryOrder } = useCategoryOrder()
+  const groups = orderGroups(groupByCategory(availableItems(items)), categoryOrder)
   const boards = paginateGroups(groups, ITEMS_PER_BOARD)
   const [page, setPage] = useState(0)
 
@@ -81,14 +84,20 @@ export default function TvMenu() {
                     {group.items.map((item) => (
                       <li key={item.id} className="flex items-end gap-2 text-3xl">
                         <span className="leading-tight">{item.name}</span>
-                        {/* dotted leader fills the gap between name and price */}
-                        <span
-                          aria-hidden="true"
-                          className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
-                        />
-                        <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
-                          {formatPrice(item.price)}
-                        </span>
+                        {/* $0 items (e.g. syrup/milk modifiers) show as a label
+                            with no leader or price. */}
+                        {hasPrice(item) && (
+                          <>
+                            {/* dotted leader fills the gap between name and price */}
+                            <span
+                              aria-hidden="true"
+                              className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
+                            />
+                            <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
+                              {formatItemPrice(item)}
+                            </span>
+                          </>
+                        )}
                       </li>
                     ))}
                   </ul>

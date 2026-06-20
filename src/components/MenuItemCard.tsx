@@ -1,5 +1,5 @@
 import type { MenuItem } from '../lib/menuTypes'
-import { formatPrice } from '../lib/menuUtils'
+import { formatItemPrice } from '../lib/menuUtils'
 
 export default function MenuItemCard({ item }: { item: MenuItem }) {
   return (
@@ -11,7 +11,7 @@ export default function MenuItemCard({ item }: { item: MenuItem }) {
         )}
       </div>
       <span className="font-semibold text-caramel whitespace-nowrap">
-        {formatPrice(item.price)}
+        {formatItemPrice(item)}
       </span>
     </div>
   )
