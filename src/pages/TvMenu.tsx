@@ -14,7 +14,7 @@ import {
   hasPrice,
 } from '../lib/menuUtils'
 
-const ROTATE_MS = 7500
+const ROTATE_MS = 10000
 const ITEMS_PER_BOARD = 16 // ~7 per column across two columns
 
 export default function TvMenu() {
