@@ -40,7 +40,7 @@ export default function TvMenu() {
   return (
     <main
       className={
-        'flex min-h-screen flex-col bg-cocoa p-10 text-cream ' +
+        'flex min-h-screen flex-col bg-white p-10 text-black ' +
         (cursorIdle ? 'cursor-none' : '')
       }
     >
@@ -49,7 +49,7 @@ export default function TvMenu() {
           onClick={toggleFullscreen}
           aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
           className={
-            'fixed right-5 top-5 z-10 grid h-12 w-12 place-items-center rounded-full bg-cream/10 text-cream transition hover:bg-cream/20 ' +
+            'fixed right-5 top-5 z-10 grid h-12 w-12 place-items-center rounded-full bg-black/10 text-black transition hover:bg-black/20 ' +
             (cursorIdle ? 'pointer-events-none opacity-0' : 'opacity-100')
           }
         >
@@ -61,7 +61,7 @@ export default function TvMenu() {
         <img
           src={`${import.meta.env.BASE_URL}images/sams-logo-icons.png`}
           alt=""
-          className="h-24 w-24 rounded-full bg-cream object-contain p-1"
+          className="h-24 w-24 rounded-full bg-white object-contain p-1"
         />
         <h1 className="font-display text-6xl">Sam's Sweet Treats &amp; Coffee</h1>
       </div>
@@ -77,7 +77,7 @@ export default function TvMenu() {
             <div className="columns-2 gap-x-16 [&>section]:mb-10 [&>section]:break-inside-avoid">
               {current.map((group) => (
                 <section key={group.category}>
-                  <h2 className="mb-4 text-4xl font-bold tracking-tight text-blush">
+                  <h2 className="mb-4 text-4xl font-bold tracking-tight text-black">
                     {group.category}
                   </h2>
                   <ul className="space-y-3">
@@ -91,9 +91,9 @@ export default function TvMenu() {
                             {/* dotted leader fills the gap between name and price */}
                             <span
                               aria-hidden="true"
-                              className="mb-1.5 flex-1 border-b-2 border-dotted border-cream/25"
+                              className="mb-1.5 flex-1 border-b-2 border-dotted border-black/25"
                             />
-                            <span className="shrink-0 font-semibold leading-tight tabular-nums text-blush">
+                            <span className="shrink-0 font-semibold leading-tight tabular-nums text-black">
                               {formatItemPrice(item)}
                             </span>
                           </>
@@ -114,7 +114,7 @@ export default function TvMenu() {
                   key={i}
                   className={
                     'h-3 w-3 rounded-full transition ' +
-                    (i === page % boards.length ? 'bg-blush' : 'bg-cream/25')
+                    (i === page % boards.length ? 'bg-black' : 'bg-black/25')
                   }
                 />
               ))}
